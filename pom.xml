@@ -50,7 +50,7 @@
         <configuration>
           <className>parser</className>
           <symbolsName>sym</symbolsName>
-          <cupDefinition>src/main/cup/ycalc.cup</cupDefinition>
+          <cupDefinition>src/main/cup/parser.cup</cupDefinition>
           <!-- <packageName>asdf</packageName> -->
         </configuration>
       </plugin>

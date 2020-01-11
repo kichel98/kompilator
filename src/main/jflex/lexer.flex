@@ -1,27 +1,7 @@
-/*
-  This example comes from a short article series in the Linux 
-  Gazette by Richard A. Sevenich and Christopher Lopes, titled
-  "Compiler Construction Tools". The article series starts at
-
-  http://www.linuxgazette.com/issue39/sevenich.html
-
-  Small changes and updates to newest JFlex+Cup versions 
-  by Gerwin Klein
-*/
-
-/*
-  Commented By: Christopher Lopes
-  File Name: lcalc.flex
-  To Create: > jflex lcalc.flex
-
-  and then after the parser is created
-  > javac Lexer.java
-*/
-   
 /* --------------------------Usercode Section------------------------ */
-import proba.*;
+import cup11b.*;
 import java_cup.runtime.*;
-      
+import java_cup.runtime.ComplexSymbolFactory.Location;
 %%
    
 /* -----------------Options and Declarations Section----------------- */
@@ -38,11 +18,7 @@ import java_cup.runtime.*;
 */
 %line
 %column
-    
-/* 
-   Will switch to a CUP compatibility mode to interface with a CUP
-   generated parser.
-*/
+
 %cup
    
 /*
@@ -53,21 +29,37 @@ import java_cup.runtime.*;
   Here you declare member variables and functions that are used inside
   scanner actions.  
 */
-%{   
-    /* To create a new java_cup.runtime.Symbol with information about
-       the current token, the token will have no value in this
-       case. */
-    private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
-    }
-    
-    /* Also creates a new java_cup.runtime.Symbol with information
-       about the current token, but this object has a value. */
-    private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
-    }
+%{
+   ComplexSymbolFactory symbolFactory;
+
+   public Lexer(java.io.Reader in, ComplexSymbolFactory sf){
+      this(in);
+      symbolFactory = sf;
+   }
+
+  private Symbol symbol(String name, int sym) {
+      return symbolFactory.newSymbol(name, sym, new ComplexSymbolFactory.Location(yyline+1,yycolumn+1,yychar),
+       new ComplexSymbolFactory.Location(yyline+1,yycolumn+yylength(),yychar+yylength()));
+  }
+
+  private Symbol symbol(String name, int sym, Object val) {
+      ComplexSymbolFactory.Location left = new ComplexSymbolFactory.Location(yyline+1,yycolumn+1,yychar);
+      ComplexSymbolFactory.Location right= new ComplexSymbolFactory.Location(yyline+1,yycolumn+yylength(), yychar+yylength());
+      return symbolFactory.newSymbol(name, sym, left, right,val);
+  }
+  private Symbol symbol(String name, int sym, Object val,int buflength) {
+      ComplexSymbolFactory.Location left = new ComplexSymbolFactory.Location(yyline+1,yycolumn+yylength()-buflength,yychar+yylength()-buflength);
+      ComplexSymbolFactory.Location right= new ComplexSymbolFactory.Location(yyline+1,yycolumn+yylength(), yychar+yylength());
+      return symbolFactory.newSymbol(name, sym, left, right,val);
+  }
+  private void error(String message) {
+    System.out.println("Error at line "+(yyline+1)+", column "+(yycolumn+1)+" : "+message);
+  }
 %}
    
+%eofval{
+     return symbolFactory.newSymbol("EOF", sym.EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));
+%eofval}
 
 /*
   Macro Declarations
@@ -108,29 +100,29 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
 <YYINITIAL> {
    
     /* Return the token SEMI declared in the class sym that was found. */
-    ";"                { return symbol(sym.SEMI); }
+    ";"                { return symbol(";",sym.SEMI); }
    
     /* Print the token found that was declared in the class sym and then
        return it. */
-    "+"                { System.out.print(" + "); return symbol(sym.PLUS); }
-    "-"                { System.out.print(" - "); return symbol(sym.MINUS); }
-    "*"                { System.out.print(" * "); return symbol(sym.TIMES); }
-    "/"                { System.out.print(" / "); return symbol(sym.DIVIDE); }
-    "("                { System.out.print(" ( "); return symbol(sym.LPAREN); }
-    ")"                { System.out.print(" ) "); return symbol(sym.RPAREN); }
+    "+"                { System.out.print(" + "); return symbol("plus",sym.PLUS); }
+    "-"                { System.out.print(" - "); return symbol("minus",sym.MINUS); }
+    "*"                { System.out.print(" * "); return symbol("*",sym.TIMES); }
+    "/"                { System.out.print(" / "); return symbol("/",sym.DIVIDE); }
+    "("                { System.out.print(" ( "); return symbol("(",sym.LPAREN); }
+    ")"                { System.out.print(" ) "); return symbol(")",sym.RPAREN); }
    
     /* If an integer is found print it out, return the token NUMBER
        that represents an integer and the value of the integer that is
        held in the string yytext which will get turned into an integer
        before returning */
     {dec_int_lit}      { System.out.print(yytext());
-                         return symbol(sym.NUMBER, new Integer(yytext())); }
+                         return symbol("integer",sym.NUMBER, new Integer(yytext())); }
    
     /* If an identifier is found print it out, return the token ID
        that represents an identifier and the default value one that is
        given to all identifiers. */
     {dec_int_id}       { System.out.print(yytext());
-                         return symbol(sym.ID, new Integer(1));}
+                         return symbol("ident",sym.ID, new Integer(1));}
    
     /* Don't do anything if whitespace is found */
     {WhiteSpace}       { /* just skip what was found, do nothing */ }   

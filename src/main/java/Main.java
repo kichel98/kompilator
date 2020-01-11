@@ -20,14 +20,17 @@
   > java Main test.txt
   where test.txt is an test input file for the calculator.
 */   
-import proba.*;
+import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.SymbolFactory;
+import cup11b.*;
 import java.io.*;
    
 public class Main {
   static public void main(String argv[]) {    
     /* Start the parser */
     try {
-      parser p = new parser(new Lexer(new FileReader(argv[0])));
+      ComplexSymbolFactory symbolFactory = new ComplexSymbolFactory();
+      parser p = new parser(new Lexer(new FileReader(argv[0]), symbolFactory), symbolFactory);
       Object result = p.parse().value;      
     } catch (Exception e) {
       /* do cleanup here -- possibly rethrow e */
