@@ -16,12 +16,13 @@ import cup11b.parser;
 import java_cup.runtime.ComplexSymbolFactory;
 import syntax.Program;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Main {
-    static public void main(String argv[]) {
-        /* Start the parser */
+    static public void main(String[] argv) {
         try {
             ComplexSymbolFactory symbolFactory = new ComplexSymbolFactory();
             parser p = new parser(new Lexer(new FileReader(argv[0]), symbolFactory), symbolFactory);
@@ -31,10 +32,18 @@ public class Main {
             MainVisitor visitor = new MainVisitor(writer);
             result.accept(visitor);
             writer.close();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            printUsage();
+        } catch (FileNotFoundException e) { // changed from IOException
+            System.out.println("File not found");
         } catch (Exception e) {
-            /* do cleanup here -- possibly rethrow e */
+            // TODO: Error handling
             e.printStackTrace();
         }
+    }
+
+    private static void printUsage() {
+        System.out.println("Usage: java core.Main <inputfile> <outputFile>");
     }
 }
 

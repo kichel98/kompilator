@@ -11,6 +11,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
    The name of the class JFlex will create will be Lexer.
    Will write the code to the file Lexer.java. 
 */
+%public
 %class Lexer
 
 /*
