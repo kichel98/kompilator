@@ -31,7 +31,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputStreamCtor>true</inputStreamCtor>
+<!--              <inputStreamCtor>true</inputStreamCtor>-->
             </configuration>
           </execution>
         </executions>

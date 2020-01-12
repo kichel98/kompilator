@@ -26,12 +26,12 @@ To run:
 
 ```
 mvn package
-java -jar target/simple-maven-full-1.0.jar Main test.txt
+java -jar target/simple-maven-full-1.0.jar core.Main test.txt
 ```
 
 ## Files:
 
-* `src/main/java/Main.java`         demo of a main program
+* `src/main/java/core.Main.java`         demo of a main program
 * `src/main/flex/lcalc.flex`        the lexer spec
 * `src/main/cup/ycalc.cup`          the parser spec
 * `src/test/resources/test.txt`     sample input for testing
