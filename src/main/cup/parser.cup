@@ -5,60 +5,68 @@ package cup11b;
 /* Import the class java_cup.runtime.*  */
 import java_cup.runtime.*;
 import syntax.*;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java.util.ArrayList;
+import java.util.List;
 /* Parser code to change the way the parser reports errors (include
    line and column number of the error). */
 parser code {:
-    
-    /* Change the method report_error so it will display the line and
-       column of where the error occurred in the input as well as the
-       reason for the error which is passed into the method in the
-       String 'message'. */
-    public void report_error(String message, Object info) {
-   
-        /* Create a StringBuilder called 'm' with the string 'Error' in it. */
-        StringBuilder m = new StringBuilder("Error");
-   
-        /* Check if the information passed to the method is the same
-           type as the type java_cup.runtime.Symbol. */
-        if (info instanceof java_cup.runtime.Symbol) {
-            /* Declare a java_cup.runtime.Symbol object 's' with the
-               information in the object info that is being typecasted
-               as a java_cup.runtime.Symbol object. */
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-   
-            /* Check if the line number in the input is greater or
-               equal to zero. */
-            if (s.left >= 0) {                
-                /* Add to the end of the StringBuilder error message
-                   the line number of the error in the input. */
-                m.append(" in line "+(s.left+1));   
-                /* Check if the column number in the input is greater
-                   or equal to zero. */
-                if (s.right >= 0)                    
-                    /* Add to the end of the StringBuilder error message
-                       the column number of the error in the input. */
-                    m.append(", column "+(s.right+1));
-            }
+        public void syntax_error(Symbol cur_token){
+            ComplexSymbol cur_token_obj = (ComplexSymbol) cur_token;
+    	    System.err.println("CUP: Syntax error: left " + cur_token_obj.xleft + ", right " + cur_token_obj.xright);
         }
-   
-        /* Add to the end of the StringBuilder error message created in
-           this method the message that was passed into this method. */
-        m.append(" : "+message);
-   
-        /* Print the contents of the StringBuilder 'm', which contains
-           an error message, out on a line. */
-        System.err.println(m);
-    }
-   
-    /* Change the method report_fatal_error so when it reports a fatal
-       error it will display the line and column number of where the
-       fatal error occurred in the input as well as the reason for the
-       fatal error which is passed into the method in the object
-       'message' and then exit.*/
-    public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
-        System.exit(1);
-    }
+//    /* Change the method report_error so it will display the line and
+//       column of where the error occurred in the input as well as the
+//       reason for the error which is passed into the method in the
+//       String 'message'. */
+//    public void report_error(String message, Object info) {
+//
+//        /* Create a StringBuilder called 'm' with the string 'Error' in it. */
+//        StringBuilder m = new StringBuilder("Error");
+//
+//        /* Check if the information passed to the method is the same
+//           type as the type java_cup.runtime.Symbol. */
+//        if (info instanceof java_cup.runtime.Symbol) {
+//            /* Declare a java_cup.runtime.Symbol object 's' with the
+//               information in the object info that is being typecasted
+//               as a java_cup.runtime.Symbol object. */
+//            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+//
+//            /* Check if the line number in the input is greater or
+//               equal to zero. */
+//            if (s.left >= 0) {
+//                /* Add to the end of the StringBuilder error message
+//                   the line number of the error in the input. */
+//                m.append(" in line "+(s.left+1));
+//                /* Check if the column number in the input is greater
+//                   or equal to zero. */
+//                if (s.right >= 0)
+//                    /* Add to the end of the StringBuilder error message
+//                       the column number of the error in the input. */
+//                    m.append(", column "+(s.right+1));
+//            }
+//        }
+//
+//        /* Add to the end of the StringBuilder error message created in
+//           this method the message that was passed into this method. */
+//        m.append(" : "+message);
+//
+//        /* Print the contents of the StringBuilder 'm', which contains
+//           an error message, out on a line. */
+//        System.err.println(m);
+//    }
+//
+//    /* Change the method report_fatal_error so when it reports a fatal
+//       error it will display the line and column number of where the
+//       fatal error occurred in the input as well as the reason for the
+//       fatal error which is passed into the method in the object
+//       'message' and then exit.*/
+//    public void report_fatal_error(String message, Object info) {
+//        report_error(message, info);
+//        System.exit(1);
+//    }
+
+
 :};
    
 
@@ -70,7 +78,9 @@ parser code {:
    Terminals that have no value are listed first and then terminals
    that do have an value, in this case an integer value, are listed on
    the next line down. */
-terminal            DECLARE, BEGIN, END, PLUS;
+terminal            DECLARE, BEGIN, END, ASSIGN, IF, THEN, ELSE, ENDIF, WHILE, DO, ENDWHILE, ENDDO, FOR, FROM,
+                    TO, DOWNTO, ENDFOR, READ, WRITE, PLUS, MINUS, TIMES, DIV, MOD, LPAR, RPAR, COLON, SEMICOLON, COMMA;
+terminal String     pidentifier;
 terminal Integer    num;
    
 /* Non terminals used in the grammar section.  
@@ -79,10 +89,15 @@ terminal Integer    num;
    non terminals that have an integer value are listed.  An object
    value means that it can be any type, it isn't set to a specific
    type.  So it could be an Integer or a String or whatever. */
-non terminal Program     program;
-non terminal Expression  expression;
-//non terminal Integer    expr, factor, term;
-   
+non terminal Program            program;
+non terminal List<Declaration>  declarations;
+non terminal List<Command>      commands;
+non terminal Command            command;
+non terminal Expression         expression;
+//non terminal Condition          condition;
+non terminal Value              value;
+non terminal Identifier         identifier;
+
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
    
@@ -101,9 +116,22 @@ non terminal Expression  expression;
 
 
 /* ----------------------------Grammar Section-------------------- */
-program ::= DECLARE BEGIN expression:expr END                     {: RESULT = new Program(expr); :}
-    | BEGIN expression:expr END                              {: RESULT = new Program(expr); :}
+program ::= DECLARE declarations:decllist BEGIN commands:cmdlist END    {: RESULT = new Program(decllist, cmdlist); :}
+    | BEGIN commands:cmdlist END                                        {: RESULT = new Program(cmdlist); :}
     ;
-
-expression ::= num:a PLUS num:b                         {: RESULT = new AddExpression(a, b); :}
+declarations ::= declarations:decllist COMMA pidentifier:id             {: decllist.add(new VarDeclaration(id)); RESULT = decllist; :}
+    | pidentifier:id                                                    {: List<Declaration> list = new ArrayList<Declaration>(); list.add(new VarDeclaration(id)); RESULT = list; :}
+    ;
+commands ::= commands:cmdlist command:cmd                               {: cmdlist.add(cmd); RESULT = cmdlist; :}
+    | command:cmd                                                       {: List<Command> list = new ArrayList<Command>(); list.add(cmd); RESULT = list; :}
+    ;
+command ::= READ identifier:id SEMICOLON                                {: RESULT = new ReadCommand(id); :}
+    | WRITE value:val SEMICOLON                                         {: RESULT = new WriteCommand(val); :}
+    ;
+expression ::= value:val                                                {: RESULT = new ValueExpression(val); :}
+    ;
+value ::= num:num                                                       {: RESULT = new NumValue(num); :}
+    | identifier:id                                                     {: RESULT = new IdentValue(id); :}
+    ;
+identifier ::= pidentifier:pid                                          {: RESULT = new VarIdentifier(pid); :}
     ;

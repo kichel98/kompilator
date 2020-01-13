@@ -1,10 +1,12 @@
 package core;
 
-import syntax.AddExpression;
+import syntax.NumValue;
 import syntax.Program;
+import syntax.WriteCommand;
 
 public interface Visitor {
     void visit(Program p);
-
-    void visit(AddExpression expr);
+    void preVisit(WriteCommand cmd);
+    void postVisit(WriteCommand cmd);
+    void visit(NumValue val);
 }

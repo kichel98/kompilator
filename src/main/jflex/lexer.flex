@@ -2,7 +2,6 @@ package core;
 /* --------------------------Usercode Section------------------------ */
 import cup11b.*; 
 import java_cup.runtime.*;
-import java_cup.runtime.ComplexSymbolFactory.Location;
 %%
    
 /* -----------------Options and Declarations Section----------------- */
@@ -60,7 +59,7 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 %}
    
 %eofval{
-     return symbolFactory.newSymbol("EOF", sym.EOF, new Location(yyline+1,yycolumn+1,yychar), new Location(yyline+1,yycolumn+1,yychar+1));
+     return symbolFactory.newSymbol("EOF", sym.EOF, new ComplexSymbolFactory.Location(yyline+1,yycolumn+1,yychar), new ComplexSymbolFactory.Location(yyline+1,yycolumn+1,yychar+1));
 %eofval}
 
 /*
@@ -80,12 +79,12 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 /* A literal integer is is a number beginning with a number between
    one and nine followed by zero or more numbers between zero and nine
    or just a zero.  */
-dec_int_lit = 0 | [1-9][0-9]*
+num = 0 | [1-9][0-9]*
    
 /* A identifier integer is a word beginning a letter between A and
    Z, a and z, or an underscore followed by zero or more letters
    between A and Z, a and z, zero and nine, or an underscore. */
-dec_int_id = [A-Za-z_][A-Za-z_0-9]*
+pidentifier = [_a-z]+
    
 %%
 /* ------------------------Lexical Rules Section---------------------- */
@@ -101,23 +100,45 @@ dec_int_id = [A-Za-z_][A-Za-z_0-9]*
    
 <YYINITIAL> {
    
+   "[]"                      { }
+
     /* Return the token SEMI declared in the class sym that was found. */
     "DECLARE"                { return symbol("declare",sym.DECLARE); }
     "BEGIN"                  { return symbol("begin",sym.BEGIN); }
     "END"                    { return symbol("end",sym.END); }
-    "PLUS"                   { return symbol("+", sym.PLUS); }
 
-    /* If an integer is found print it out, return the token NUMBER
-       that represents an integer and the value of the integer that is
-       held in the string yytext which will get turned into an integer
-       before returning */
-    {dec_int_lit}      { return symbol("num",sym.num, new Integer(yytext())); }
+    "ASSIGN"                 { return symbol("assign", sym.ASSIGN); }
+    "IF"                     { return symbol("if", sym.IF); }
+    "THEN"                   { return symbol("then", sym.THEN); }
+    "ELSE"                   { return symbol("else", sym.ELSE); }
+    "ENDIF"                  { return symbol("endif", sym.ENDIF); }
+    "WHILE"                  { return symbol("while", sym.WHILE); }
+    "DO"                     { return symbol("do", sym.DO); }
+    "ENDWHILE"               { return symbol("endwhile", sym.ENDWHILE); }
+    "ENDDO"                  { return symbol("enddo", sym.ENDDO); }
+    "FOR"                    { return symbol("for", sym.FOR); }
+    "FROM"                   { return symbol("from", sym.FROM); }
+    "TO"                     { return symbol("to", sym.TO); }
+    "DOWNTO"                 { return symbol("downto", sym.DOWNTO); }
+    "ENDFOR"                 { return symbol("endfor", sym.ENDFOR); }
+    "READ"                   { return symbol("read", sym.READ); }
+    "WRITE"                  { return symbol("write", sym.WRITE); }
+
+    "PLUS"                   { return symbol("+", sym.PLUS); }
+    "MINUS"                  { return symbol("-", sym.MINUS); }
+    "TIMES"                  { return symbol("*", sym.TIMES); }
+    "DIV"                    { return symbol("/", sym.DIV); }
+    "MOD"                    { return symbol("%", sym.MOD); }
+
+    "("                      { return symbol("(", sym.LPAR); }
+    ")"                      { return symbol(")", sym.RPAR); }
+    ":"                      { return symbol(":", sym.COLON); }
+    ";"                      { return symbol(";", sym.SEMICOLON); }
+    ","                      { return symbol(",", sym.COMMA); }
+
+    {num}                    { return symbol("num", sym.num, new Integer(yytext())); }
    
-   //  /* If an identifier is found print it out, return the token ID
-   //     that represents an identifier and the default value one that is
-   //     given to all identifiers. */
-   //  {dec_int_id}       { System.out.print(yytext());
-   //                       return symbol("ident",sym.ID, new Integer(1));}
+    {pidentifier}            { return symbol("ident", sym.pidentifier, yytext()); }
    
     /* Don't do anything if whitespace is found */
     {WhiteSpace}       { /* just skip what was found, do nothing */ }

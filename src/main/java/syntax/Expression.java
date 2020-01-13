@@ -1,5 +1,3 @@
 package syntax;
 
-abstract public class Expression implements SyntaxElement {
-
-}
+public interface Expression extends SyntaxElement {}

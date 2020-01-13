@@ -62,7 +62,7 @@ public class TestUtils {
         argv[0] = inputFile;
         argv[1] = outputFile;
 
-        File actual = new File(inputFile);
+        File actual = new File(outputFile);
         actual.delete();
         FileOutputStream fos = new FileOutputStream(outputFile, true);
         System.setOut(new PrintStream(fos));

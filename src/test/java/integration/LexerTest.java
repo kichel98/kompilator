@@ -25,7 +25,7 @@ public class LexerTest {
         List<File> fileList = TestUtils.prepareFullIntegrationTest(inputFile, outputFile, expectedFile);
 
         // then
-//        TestUtils.checkFileContent(fileList);
+        TestUtils.checkFileContent(fileList);
     }
 
 
