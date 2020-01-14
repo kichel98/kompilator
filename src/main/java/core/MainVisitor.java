@@ -1,9 +1,8 @@
 package core;
 
-import syntax.AddExpression;
-import syntax.NumValue;
+import syntax.value.NumValue;
 import syntax.Program;
-import syntax.WriteCommand;
+import syntax.command.WriteCommand;
 
 import java.io.PrintWriter;
 
@@ -31,7 +30,7 @@ public class MainVisitor implements Visitor {
 
     @Override
     public void visit(NumValue val) {
-        writer.print(val.getNum());
+        writer.print(val.getNumConst());
     }
 
 }

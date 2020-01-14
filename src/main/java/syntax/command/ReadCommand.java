@@ -1,11 +1,12 @@
-package syntax;
+package syntax.command;
 
 import core.Visitor;
+import syntax.identifier.Identifier;
 
-public class IdentValue implements Value {
+public class ReadCommand implements Command {
     private Identifier id;
 
-    public IdentValue(Identifier id) {
+    public ReadCommand(Identifier id) {
         this.id = id;
     }
 
@@ -19,6 +20,6 @@ public class IdentValue implements Value {
 
     @Override
     public void accept(Visitor visitor) {
-        
+
     }
 }

@@ -3,6 +3,14 @@ package unit;
 import cup11b.parser;
 import org.junit.Test;
 import syntax.*;
+import syntax.command.Command;
+import syntax.command.ReadCommand;
+import syntax.command.WriteCommand;
+import syntax.declarations.Declaration;
+import syntax.declarations.VarDeclaration;
+import syntax.identifier.VarIdentifier;
+import syntax.value.IdentValue;
+import syntax.value.NumValue;
 import utils.TestUtils;
 
 import java.util.ArrayList;
@@ -38,7 +46,7 @@ public class ProgramTest {
                 new ArrayList<Command>() {{
                     add(new ReadCommand(new VarIdentifier("_zmienna")));
                     add(new WriteCommand(new IdentValue(new VarIdentifier("_zmienna"))));
-                    add(new WriteCommand(new NumValue(1)));
+                    add(new WriteCommand(new NumValue(1L)));
                 }});
 
         parser p = TestUtils.prepareParserTest(input);

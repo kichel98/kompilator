@@ -1,9 +1,10 @@
-package syntax;
+package syntax.expression;
 
 import core.Visitor;
+import syntax.value.Value;
 
 public class AddExpression implements Expression {
-    public Value a, b;
+    private Value a, b;
     public AddExpression(Value a, Value b) {
         this.a = a;
         this.b = b;

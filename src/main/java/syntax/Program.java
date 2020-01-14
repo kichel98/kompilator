@@ -1,6 +1,8 @@
 package syntax;
 
 import core.Visitor;
+import syntax.command.Command;
+import syntax.declarations.Declaration;
 
 import java.util.List;
 

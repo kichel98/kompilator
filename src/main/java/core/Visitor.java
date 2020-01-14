@@ -1,8 +1,8 @@
 package core;
 
-import syntax.NumValue;
+import syntax.value.NumValue;
 import syntax.Program;
-import syntax.WriteCommand;
+import syntax.command.WriteCommand;
 
 public interface Visitor {
     void visit(Program p);

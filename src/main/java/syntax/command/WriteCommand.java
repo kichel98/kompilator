@@ -1,11 +1,12 @@
-package syntax;
+package syntax.command;
 
 import core.Visitor;
+import syntax.value.Value;
 
-public class ValueExpression implements Expression {
+public class WriteCommand implements Command {
     private Value value;
 
-    public ValueExpression(Value value) {
+    public WriteCommand(Value value) {
         this.value = value;
     }
 
@@ -19,6 +20,8 @@ public class ValueExpression implements Expression {
 
     @Override
     public void accept(Visitor visitor) {
-
+        visitor.preVisit(this);
+        value.accept(visitor);
+        visitor.postVisit(this);
     }
 }

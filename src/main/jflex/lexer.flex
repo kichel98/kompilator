@@ -79,7 +79,7 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 /* A literal integer is is a number beginning with a number between
    one and nine followed by zero or more numbers between zero and nine
    or just a zero.  */
-num = 0 | [1-9][0-9]*
+num = 0 | "-"?[1-9][0-9]*
    
 /* A identifier integer is a word beginning a letter between A and
    Z, a and z, or an underscore followed by zero or more letters
@@ -100,9 +100,8 @@ pidentifier = [_a-z]+
    
 <YYINITIAL> {
    
-   "[]"                      { }
+    "[" [^\[]* "]"                      {  } /* comments */
 
-    /* Return the token SEMI declared in the class sym that was found. */
     "DECLARE"                { return symbol("declare",sym.DECLARE); }
     "BEGIN"                  { return symbol("begin",sym.BEGIN); }
     "END"                    { return symbol("end",sym.END); }
@@ -130,13 +129,20 @@ pidentifier = [_a-z]+
     "DIV"                    { return symbol("/", sym.DIV); }
     "MOD"                    { return symbol("%", sym.MOD); }
 
+    "EQ"                     { return symbol("=", sym.EQ); }
+    "NEQ"                    { return symbol("!=", sym.NEQ); }
+    "LE"                     { return symbol("<", sym.LE); }
+    "GE"                     { return symbol(">", sym.GE); }
+    "LEQ"                    { return symbol("<=", sym.LEQ); }
+    "GEQ"                    { return symbol(">=", sym.GEQ); }
+
     "("                      { return symbol("(", sym.LPAR); }
     ")"                      { return symbol(")", sym.RPAR); }
     ":"                      { return symbol(":", sym.COLON); }
     ";"                      { return symbol(";", sym.SEMICOLON); }
     ","                      { return symbol(",", sym.COMMA); }
 
-    {num}                    { return symbol("num", sym.num, new Integer(yytext())); }
+    {num}                    { return symbol("num", sym.num, Long.parseLong(yytext())); }
    
     {pidentifier}            { return symbol("ident", sym.pidentifier, yytext()); }
    
@@ -147,4 +153,4 @@ pidentifier = [_a-z]+
 
 /* No token was found for the input so through an error.  Print out an
    Illegal character message with the illegal character that was found. */
-[^]                    { throw new Error("Unexpected token <"+yytext()+">"); }
+[^]                    { throw new Error("Unexpected token <"+yytext()+">" + ", line: " + yyline + ", column: " + yycolumn); }

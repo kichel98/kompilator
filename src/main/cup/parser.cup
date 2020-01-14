@@ -5,6 +5,12 @@ package cup11b;
 /* Import the class java_cup.runtime.*  */
 import java_cup.runtime.*;
 import syntax.*;
+import syntax.command.*;
+import syntax.condition.*;
+import syntax.declarations.*;
+import syntax.expression.*;
+import syntax.identifier.*;
+import syntax.value.*;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +35,10 @@ parser code {:
    that do have an value, in this case an integer value, are listed on
    the next line down. */
 terminal            DECLARE, BEGIN, END, ASSIGN, IF, THEN, ELSE, ENDIF, WHILE, DO, ENDWHILE, ENDDO, FOR, FROM,
-                    TO, DOWNTO, ENDFOR, READ, WRITE, PLUS, MINUS, TIMES, DIV, MOD, LPAR, RPAR, COLON, SEMICOLON, COMMA;
+                    TO, DOWNTO, ENDFOR, READ, WRITE, PLUS, MINUS, TIMES, EQ, NEQ, LE, GE, LEQ, GEQ,
+                    DIV, MOD, LPAR, RPAR, COLON, SEMICOLON, COMMA;
 terminal String     pidentifier;
-terminal Integer    num;
+terminal Long       num;
    
 /* Non terminals used in the grammar section.  
 
@@ -44,7 +51,7 @@ non terminal List<Declaration>  declarations;
 non terminal List<Command>      commands;
 non terminal Command            command;
 non terminal Expression         expression;
-//non terminal Condition          condition;
+non terminal Condition          condition;
 non terminal Value              value;
 non terminal Identifier         identifier;
 
@@ -66,22 +73,45 @@ non terminal Identifier         identifier;
 
 
 /* ----------------------------Grammar Section-------------------- */
-program ::= DECLARE declarations:decllist BEGIN commands:cmdlist END    {: RESULT = new Program(decllist, cmdlist); :}
-    | BEGIN commands:cmdlist END                                        {: RESULT = new Program(cmdlist); :}
+program ::= DECLARE declarations:decllist BEGIN commands:cmdlist END        {: RESULT = new Program(decllist, cmdlist); :}
+    | BEGIN commands:cmdlist END                                            {: RESULT = new Program(cmdlist); :}
     ;
-declarations ::= declarations:decllist COMMA pidentifier:id             {: decllist.add(new VarDeclaration(id)); RESULT = decllist; :}
-    | pidentifier:id                                                    {: List<Declaration> list = new ArrayList<Declaration>(); list.add(new VarDeclaration(id)); RESULT = list; :}
+declarations ::= declarations:decllist COMMA pidentifier:id                 {: decllist.add(new VarDeclaration(id)); RESULT = decllist; :}
+    | declarations:d COMMA pidentifier:id LPAR num:num1 COLON num:num2 RPAR {: d.add(new ArrDeclaration(id, num1, num2)); RESULT = d; :}
+    | pidentifier:id                                                        {: List<Declaration> list = new ArrayList<Declaration>(); list.add(new VarDeclaration(id)); RESULT = list; :}
+    | pidentifier:id LPAR num:num1 COLON num:num2 RPAR                      {: List<Declaration> list = new ArrayList<Declaration>(); list.add(new ArrDeclaration(id, num1, num2)); RESULT = list; :}
     ;
-commands ::= commands:cmdlist command:cmd                               {: cmdlist.add(cmd); RESULT = cmdlist; :}
-    | command:cmd                                                       {: List<Command> list = new ArrayList<Command>(); list.add(cmd); RESULT = list; :}
+commands ::= commands:cmdlist command:cmd                                   {: cmdlist.add(cmd); RESULT = cmdlist; :}
+    | command:cmd                                                           {: List<Command> list = new ArrayList<Command>(); list.add(cmd); RESULT = list; :}
     ;
-command ::= READ identifier:id SEMICOLON                                {: RESULT = new ReadCommand(id); :}
-    | WRITE value:val SEMICOLON                                         {: RESULT = new WriteCommand(val); :}
+command ::= identifier:id ASSIGN expression:expr SEMICOLON                  {: RESULT = new AssignCommand(id, expr); :}
+    | IF condition:cond THEN commands:cmd1 ELSE commands:cmd2 ENDIF         {: RESULT = new IfElseCommand(cond, cmd1, cmd2); :}
+    | IF condition:cond THEN commands:cmd ENDIF                             {: RESULT = new IfCommand(cond, cmd); :}
+    | WHILE condition:cond DO commands:cmd ENDWHILE                         {: RESULT = new WhileCommand(cond, cmd); :}
+    | DO commands:cmd WHILE condition:cond ENDDO                            {: RESULT = new DoWhileCommand(cmd, cond); :}
+    | FOR pidentifier:id FROM value:v1 TO value:v2 DO commands:c ENDFOR     {: RESULT = new ForToCommand(id, v1, v2, c); :}
+    | FOR pidentifier:id FROM value:v1 DOWNTO value:v2 DO commands:c ENDFOR {: RESULT = new ForDownToCommand(id, v1, v2, c); :}
+    | READ identifier:id SEMICOLON                                          {: RESULT = new ReadCommand(id); :}
+    | WRITE value:val SEMICOLON                                             {: RESULT = new WriteCommand(val); :}
     ;
-expression ::= value:val                                                {: RESULT = new ValueExpression(val); :}
+expression ::= value:val                                                    {: RESULT = new ValueExpression(val); :}
+    | value:val1 PLUS value:val2                                            {: RESULT = new AddExpression(val1, val2); :}
+    | value:val1 MINUS value:val2                                           {: RESULT = new SubExpression(val1, val2); :}
+    | value:val1 TIMES value:val2                                           {: RESULT = new MulExpression(val1, val2); :}
+    | value:val1 DIV value:val2                                             {: RESULT = new DivExpression(val1, val2); :}
+    | value:val1 MOD value:val2                                             {: RESULT = new ModExpression(val1, val2); :}
     ;
-value ::= num:num                                                       {: RESULT = new NumValue(num); :}
-    | identifier:id                                                     {: RESULT = new IdentValue(id); :}
+condition ::= value:val1 EQ value:val2                                      {: RESULT = new EqCondition(val1, val2, sym.EQ); :}
+    | value:val1 NEQ value:val2                                             {: RESULT = new NeqCondition(val1, val2, sym.NEQ); :}
+    | value:val1 LE value:val2                                              {: RESULT = new LeCondition(val1, val2, sym.LE); :}
+    | value:val1 GE value:val2                                              {: RESULT = new GeCondition(val1, val2, sym.GE); :}
+    | value:val1 LEQ value:val2                                             {: RESULT = new LeqCondition(val1, val2, sym.LEQ); :}
+    | value:val1 GEQ value:val2                                             {: RESULT = new GeqCondition(val1, val2, sym.GEQ); :}
     ;
-identifier ::= pidentifier:pid                                          {: RESULT = new VarIdentifier(pid); :}
+value ::= num:num                                                           {: RESULT = new NumValue(num); :}
+    | identifier:id                                                         {: RESULT = new IdentValue(id); :}
+    ;
+identifier ::= pidentifier:pid                                              {: RESULT = new VarIdentifier(pid); :}
+    | pidentifier:pid1 LPAR pidentifier:pid2 RPAR                           {: RESULT = new ArrVarIdentifier(pid1, pid2); :}
+    | pidentifier:pid LPAR num:num RPAR                                     {: RESULT = new ArrConstIdentifier(pid, num); :}
     ;
