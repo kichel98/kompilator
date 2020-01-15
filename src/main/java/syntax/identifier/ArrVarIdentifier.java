@@ -2,27 +2,19 @@ package syntax.identifier;
 
 import core.Visitor;
 
-public class ArrVarIdentifier implements Identifier {
-    private String arr, varIndex;
+public class ArrVarIdentifier extends Identifier {
+    private String varIndex;
 
     public ArrVarIdentifier(String arr, String varIndex) {
-        this.arr = arr;
+        super(arr);
         this.varIndex = varIndex;
-    }
-
-    public String getArr() {
-        return arr;
-    }
-
-    public void setArr(String arr) {
-        this.arr = arr;
     }
 
     public String getVarIndex() {
         return varIndex;
     }
 
-    public void setVarIndex(String pid2) {
+    public void setVarIndex(String varIndex) {
         this.varIndex = varIndex;
     }
 

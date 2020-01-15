@@ -20,8 +20,7 @@ public class WriteCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-        visitor.preVisit(this);
         value.accept(visitor);
-        visitor.postVisit(this);
+        visitor.visit(this);
     }
 }

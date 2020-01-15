@@ -2,23 +2,13 @@ package syntax.declarations;
 
 import core.Visitor;
 
-public class VarDeclaration implements Declaration {
-    private String varName;
-
+public class VarDeclaration extends Declaration {
     public VarDeclaration(String varName) {
-        this.varName = varName;
-    }
-
-    public String getVarName() {
-        return varName;
-    }
-
-    public void setVarName(String varName) {
-        this.varName = varName;
+        super(varName);
     }
 
     @Override
     public void accept(Visitor visitor) {
-
+        visitor.visit(this);
     }
 }

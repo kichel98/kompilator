@@ -20,6 +20,7 @@ public class ReadCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        id.accept(visitor);
+        visitor.visit(this);
     }
 }

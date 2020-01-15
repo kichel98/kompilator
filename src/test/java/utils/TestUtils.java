@@ -21,7 +21,7 @@ public class TestUtils {
         return new parser(new Lexer(new StringReader(input), symbolFactory), symbolFactory);
     }
 
-    static class WriterWithVisitor {
+    public static class WriterWithVisitor {
         private Writer writer;
         private Visitor visitor;
 
@@ -46,14 +46,17 @@ public class TestUtils {
         return new WriterWithVisitor(printWriter, visitor);
     }
 
-    public static WriterWithVisitor prepareFullUnitTest(String input) throws Exception {
+    public static Program prepareFullUnitTest(String input) throws Exception {
         ComplexSymbolFactory symbolFactory = new ComplexSymbolFactory();
         parser p = new parser(new Lexer(new StringReader(input), symbolFactory), symbolFactory);
-        Program result = (Program) p.parse().value;
+        return (Program) p.parse().value;
+    }
+
+    public static WriterWithVisitor getVisitorAndWriterInstance() {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         MainVisitor visitor = new MainVisitor(printWriter);
-        return new WriterWithVisitor(printWriter, visitor);
+        return new WriterWithVisitor(stringWriter, visitor);
     }
 
     public static List<File> prepareFullIntegrationTest(String inputFile, String outputFile, String expectedFile)

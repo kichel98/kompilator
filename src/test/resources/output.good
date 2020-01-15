@@ -1,2 +1,5 @@
-# poczatek
-PUT 3
+GET
+STORE 1
+LOAD 1
+PUT
+HALT

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProgramTest {
+public class AbstractSyntaxTreeTest {
 
     @Test(expected = Exception.class)
     public void programWithoutCommandsShouldFail() throws Exception {
@@ -52,7 +52,7 @@ public class ProgramTest {
         parser p = TestUtils.prepareParserTest(input);
 
         Program actual = (Program) p.parse().value;
-        assertThat(expected).usingRecursiveComparison().isEqualTo(actual);
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
 }

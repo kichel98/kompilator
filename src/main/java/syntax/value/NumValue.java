@@ -1,5 +1,6 @@
 package syntax.value;
 
+import core.Memory;
 import core.Visitor;
 
 public class NumValue implements Value {
@@ -19,6 +20,6 @@ public class NumValue implements Value {
 
     @Override
     public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
+
 }
