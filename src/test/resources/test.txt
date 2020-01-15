@@ -1,6 +1,8 @@
 DECLARE
-    a
+    a, b
 BEGIN
     READ a;
+    READ b;
     WRITE a;
+    WRITE b;
 END

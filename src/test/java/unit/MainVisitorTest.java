@@ -12,9 +12,11 @@ public class MainVisitorTest {
     public void readAndWrite() throws Exception {
         String input = String.join("\n",
                 "DECLARE",
-                "   a",
+                "   a, b",
                 "BEGIN",
                 "   READ a;",
+                "   READ b;",
+                "   WRITE b;",
                 "   WRITE a;",
                 "END");
 
@@ -25,6 +27,10 @@ public class MainVisitorTest {
         String expected = String.join("\n",
                 "GET",
                 "STORE 1",
+                "GET",
+                "STORE 2",
+                "LOAD 2",
+                "PUT",
                 "LOAD 1",
                 "PUT",
                 "HALT",
