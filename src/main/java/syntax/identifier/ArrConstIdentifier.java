@@ -10,6 +10,11 @@ public class ArrConstIdentifier extends Identifier {
         this.numIndex = numIndex;
     }
 
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+
     public Long getNumIndex() {
         return numIndex;
     }
@@ -18,8 +23,5 @@ public class ArrConstIdentifier extends Identifier {
         this.numIndex = numIndex;
     }
 
-    @Override
-    public void accept(Visitor visitor) {
 
-    }
 }

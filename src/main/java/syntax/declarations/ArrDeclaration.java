@@ -3,12 +3,17 @@ package syntax.declarations;
 import core.Visitor;
 
 public class ArrDeclaration extends Declaration {
-    private Long startIndex, startName;
+    private Long startIndex, endIndex;
 
-    public ArrDeclaration(String arrName, Long startIndex, Long startName) {
+    public ArrDeclaration(String arrName, Long startIndex, Long endIndex) {
         super(arrName);
         this.startIndex = startIndex;
-        this.startName = startName;
+        this.endIndex = endIndex;
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
     }
 
     public Long getStartIndex() {
@@ -19,16 +24,11 @@ public class ArrDeclaration extends Declaration {
         this.startIndex = startIndex;
     }
 
-    public Long getStartName() {
-        return startName;
+    public Long getEndIndex() {
+        return endIndex;
     }
 
-    public void setStartName(Long startName) {
-        this.startName = startName;
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-
+    public void setEndIndex(Long endIndex) {
+        this.endIndex = endIndex;
     }
 }

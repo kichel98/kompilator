@@ -5,6 +5,8 @@ import syntax.command.ReadCommand;
 import syntax.command.WriteCommand;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
+import syntax.identifier.ArrConstIdentifier;
+import syntax.identifier.ArrVarIdentifier;
 import syntax.identifier.VarIdentifier;
 import syntax.value.IdentValue;
 import syntax.value.NumValue;
@@ -17,14 +19,18 @@ import static core.AssemblerPrinter.*;
 public class MainVisitor implements Visitor {
 
     private Memory memory = new Memory();
-    private Long temporaryVarPosition = 0L; // ostatnio obliczony indeks pamięci
 
     public MainVisitor(PrintWriter writer) {
         new AssemblerPrinter(writer);
     }
 
     @Override
-    public void visit(Program p) {
+    public void preVisit(Program p) {
+        setOneRegister();
+    }
+
+    @Override
+    public void postVisit(Program p) {
         HALT();
     }
 
@@ -35,33 +41,71 @@ public class MainVisitor implements Visitor {
 
     @Override
     public void visit(ArrDeclaration arrDeclaration) {
-        // TODO adding array to memory
-    }
-
-    @Override
-    public void visit(ReadCommand readCommand) {
-        GET();
-        STORE(temporaryVarPosition);
-    }
-
-    @Override
-    public void visit(WriteCommand writeCommand) {
-        LOAD(temporaryVarPosition);
-        PUT();
+        memory.addArrToMemory(arrDeclaration);
     }
 
     @Override
     public void visit(VarIdentifier varIdentifier) {
-        /*
-            Wyższy element w drzewie (np. WriteCommand) potrzebuje informacji od
-            niższego elementu w drzewie (np. Identifier), więc sposobem (słabym)
-            na to jest ustawienie zmiennej w Visitorze przez niższy element,
-            która chwilę później zostanie odczytana przez element wyżej.
-
-            Ten visit ew. mógłby zamiast ustawiać zmienną po prostu wypisywać swój adres,
-            ale później może to trochę utrudnić.
-         */
-        temporaryVarPosition = memory.getIndexOfIdentifier(varIdentifier.getName());
+        Long index = memory.getIndexOfVar(varIdentifier.getName());
+        generateConstant(index);
     }
 
+    @Override
+    public void visit(ArrConstIdentifier arrConstIdentifier) {
+        Long index = memory.getIndexOfArrayElement(arrConstIdentifier);
+        generateConstant(index);
+    }
+
+    @Override
+    public void visit(ArrVarIdentifier arrVarIdentifier) {
+        Long arrayIndex = memory.getIndexOfArrayStart(arrVarIdentifier);
+        generateConstant(arrayIndex);
+        STORE(Memory.Register.TMP1);
+        Long offsetIndex = memory.getIndexOfVar(arrVarIdentifier.getVarIndex());
+        LOAD(offsetIndex);
+        ADD(Memory.Register.TMP1);
+    }
+
+    @Override
+    public void visit(IdentValue identValue) {
+        LOADI(Memory.Register.ACC);
+    }
+
+    @Override
+    public void visit(NumValue numValue) {
+        generateConstant(numValue.getNumConst());
+    }
+
+    @Override
+    public void visit(ReadCommand readCommand) {
+        STORE(Memory.Register.TMP1);
+        GET();
+        STOREI(Memory.Register.TMP1);
+    }
+
+    @Override
+    public void visit(WriteCommand writeCommand) {
+        PUT();
+    }
+
+
+    private void setOneRegister() {
+        SUB(0L);
+        INC();
+        STORE(Memory.Register.ONE);
+    }
+
+
+    private void generateConstant(Long constant) {
+        LOAD(Memory.Register.ONE);
+        Long asmValue = 1L;
+        while (asmValue < constant) {
+            SHIFT(Memory.Register.ONE);
+            asmValue *= 2;
+        }
+        while (asmValue > constant) {
+            DEC();
+            asmValue--;
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package syntax.value;
 
-import core.Memory;
 import core.Visitor;
 import syntax.identifier.Identifier;
 
@@ -22,6 +21,7 @@ public class IdentValue implements Value {
     @Override
     public void accept(Visitor visitor) {
         id.accept(visitor);
+        visitor.visit(this);
     }
 
 }

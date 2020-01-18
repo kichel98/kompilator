@@ -1,0 +1,283 @@
+Co powinno się dziać przy odwiedzaniu poszczególnych nieterminali?
+
+Identifier - ma zapisać adres zmiennej ACC
+Value - ma zapisać wartość do ACC
+Condition - ma zapisać wartość boolowską do ACC (0 (może ujemna?), gdy warunek spełniony, dodatnia liczba w przeciwnym razie)
+Expression - ma zapisać wartość do ACC
+Declaration - dodaje do pamięci (w Javie)
+Command - wykonuje operacje
+
+
+// UWAGA: nie opisuję operacji wykonywanych w Javie, tylko assembler
+
+Identifier: NADPISUJE REJESTRY: ACC, TMP1
+
+    a) VarIdentifier NADPISUJE REJESTRY: ACC
+
+        generateConstant(&var)
+
+    b) ArrConstIdentifier NADPISUJE REJESTRY: ACC
+
+        generateConstant(&var)
+
+    c) ArrVarIdentifier -  NADPISUJE REJESTRY: ACC, TMP1
+
+        generateConstant(&arr(0)) # zapisujesz adres początku tablicy
+        STORE TMP1 # zapisujesz tymczasowo
+        LOAD &varIndex # wczytujesz wartość indeksu
+        ADD TMP1 # dodajesz adres początku tablicy
+
+
+Value: NADPISUJE REJESTRY: ACC, TMP1
+
+    a) NumValue  NADPISUJE REJESTRY: ACC
+
+        generateConstant(val)
+
+    b) IdentValue NADPISUJE REJESTRY: ACC, TMP1
+
+        ## uruchom ident ##
+        LOADI ACC
+
+Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+    a) EqCondition  NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JZERO set
+            SUB 0
+        JMP outside
+    set:    INC
+    outside:
+
+    b) NeqCondition  NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JZERO outside
+            LOAD ONE
+    outside:
+
+    c) LeCondition NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JNEG set
+            SUB 0
+        JMP outside
+    set:    LOAD ONE
+    outside:
+
+    d) GeCondition NADPISUJE REJESTRY: ACC, TMP1, TMP2
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JPOS set
+            SUB 0
+        JMP outside
+    set:    LOAD ONE
+    outside:
+
+    e) LeqCondition NADPISUJE REJESTRY: ACC, TMP1, TMP2
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JPOS set
+            SUB 0
+        JMP outside
+    set:    LOAD ONE
+    outside:
+
+     f) GeqCondition NADPISUJE REJESTRY: ACC, TMP1, TMP2
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+        JNEG set
+            INC # zamiast SUB 0 (jak będzie zero, to INC zrobi jedynkę)
+        JMP outside
+     set:   SUB 0
+     outside:
+
+Expression: NADPISUJE REJESTRY: ACC, TMP1, TMP2
+    a) ValueExpression NADPISUJE REJESTRY: ACC, TMP1
+
+        ## uruchom value ##
+
+    b) AddExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        ADD TMP2
+
+    c) SubExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2
+
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+        SUB TMP2
+
+    d) MulExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2
+        // TODO: dokończyć, bo jeszcze nie działa (możliwe, że mnożnik trzeba ++ lub --)
+        // TODO: ujemne i 0!
+        ## uruchom value2 ##
+        STORE TMP2
+        ## uruchom value1 ##
+
+        JMP cond
+
+cntnt:  STORE TMP2
+        LOAD TMP1
+        ADD ACC
+
+cond:   STORE TMP1
+        LOAD TMP2
+        DEC
+        JPOS cntnt
+
+        LOAD TMP1
+
+        while( tmp2 > 0) add ACC; STORE TMP1; LOAD TMP2; DEC; STORE TMP2; LOAD TMP1;
+
+    e) DivExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać DIV
+        // TODO
+    f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać DIV
+        // TODO
+
+Command: NADPISUJE REJESTRY: wszystkie rejestry komend
+
+    a) AssignCommand NADPISUJE REJESTRY: ACC, TMP1, TMP2, TMP3
+
+        ## uruchom identifier ##
+        STORE TMP3
+        ## uruchom expression ##
+        STOREI TMP3
+
+    b) IfElseCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+        ## uruchom condition ##
+        JPOS cntnt
+        ## uruchom każdą else command ##
+        JMP outside
+cntnt:  ## uruchom każdą if command ##
+outside:
+
+    c) IfCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+        ## uruchom condition ##
+        JPOS cntnt
+        JMP outside
+cntnt:  ## uruchom każdą if command ##
+outside:
+
+    d) WhileCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+        JMP cond
+cntnt:  ## uruchom każdą command ##
+cond:   ## uruchom condition ##
+        JPOS cntnt
+
+    e) DoWhileCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+cntnt: ## uruchom każdą command ##
+       ## uruchom condition ##
+       JPOS cntnt
+
+    f) ForToCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+    /*
+        Wcześniej przejdź przez wszystkie for'y i dla każdego iteratora dodaj go do mapy w Memory i zarezerwuj dwa miejsca (początek i koniec).
+        Jeśli nazwy iteratorów się powtarzają, to je nadpisz (dwie niezależne pętle, więc czemu nie - w zagnieżdżonych muszą być inne nazwy).
+    */
+
+       // znajdź indeks iteratora w Memory
+       ## uruchom value2 ##
+       STORE &iterator+1 // zapamiętujesz koniec tablicy
+       ## uruchom value1 ##
+       STORE &iterator // zapamiętujesz początek
+       // w akumulatorze masz nadal początek pętli
+
+       JMP cond
+
+cntnt: INC // trik, zamiast JNEG my chcemy JNEG + JZERO (gdy iterator jest równy końcowi pętli, to powinna się ona wykonać)
+           // dlatego przez JNEG odejmujemy jedynkę, a po skoku ją dodajemy
+       ## uruchom każdą command ##
+
+       LOAD &iterator
+       INC
+       STORE &iterator
+
+cond:  SUB &iterator+1
+       DEC
+
+       JNEG cntnt
+
+    g) ForDownToCommand NADPISUJE REJESTRY: wszystkie rejestry komend
+
+           ## uruchom value2 ##
+           STORE &iterator+1
+           ## uruchom value1 ##
+           STORE &iterator
+
+           JMP cond
+
+    cntnt: DEC
+           ## uruchom każdą command ##
+
+           LOAD &iterator
+           DEC
+           STORE &iterator
+
+    cond:  SUB &iterator+1
+           INC
+
+           JPOS cntnt
+
+    h) ReadCommand NADPISUJE REJESTRY: ACC, TMP1
+
+           ## uruchom identifier ##
+           STORE TMP1
+           GET
+           STOREI TMP1
+
+    i) WriteCommand NADPISUJE REJESTRY: ACC, TMP1
+           ## uruchom value ##
+           PUT
+
+
+
+Dodatkowe operacje:
+generateConstant(const) - umieszcza wartość stałej const (np. 7) w ACC, NADPISUJE REJESTRY: ACC
+setOneRegister() - generuje wartość 1 i umieszcza w specjalnym rejestrze ONE
+
+generateConstant(const) { // TODO! UJEMNE (będzie if, ale w Javie, po prostu załadujesz -1, a nie 1, a potem dodawał
+    LOAD ONE
+    SHIFT ONE # mnóż ACC przez 2^1 tak długo, aż przekroczysz stałą (w Javie)
+    .
+    .
+    .
+    SHIFT ONE
+
+    DEC # po tym, jak przekroczyłeś, odejmuj
+    .
+    .
+    .
+    DEC
+
+}
+
+setOneRegister() {
+    SUB 0
+    INC
+    STORE ONE
+}

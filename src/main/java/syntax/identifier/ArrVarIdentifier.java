@@ -20,6 +20,6 @@ public class ArrVarIdentifier extends Identifier {
 
     @Override
     public void accept(Visitor visitor) {
-
+        visitor.visit(this);
     }
 }

@@ -41,10 +41,11 @@ public class Program implements SyntaxElement {
         this.declarations.forEach(declaration -> {
             declaration.accept(v);
         });
+        v.preVisit(this);
         this.commands.forEach(command -> {
             command.accept(v);
         });
-        v.visit(this);
+        v.postVisit(this);
     }
 
 }
