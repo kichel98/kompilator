@@ -28,6 +28,9 @@ public class AddExpression implements Expression {
 
     @Override
     public void accept(Visitor v) {
-
+        b.accept(v);
+        v.inVisit(this);
+        a.accept(v);
+        v.postVisit(this);
     }
 }

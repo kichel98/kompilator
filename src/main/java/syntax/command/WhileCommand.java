@@ -32,6 +32,10 @@ public class WhileCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        String[] labels = visitor.preVisit(this);
+        cmdList.forEach(cmd -> cmd.accept(visitor));
+        String label = visitor.inVisit(this, labels);
+        cond.accept(visitor);
+        visitor.postVisit(this, label);
     }
 }

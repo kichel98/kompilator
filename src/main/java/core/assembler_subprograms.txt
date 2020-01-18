@@ -49,7 +49,7 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
         JZERO set
             SUB 0
-        JMP outside
+        JUMP outside
     set:    INC
     outside:
 
@@ -71,7 +71,7 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
         JNEG set
             SUB 0
-        JMP outside
+        JUMP outside
     set:    LOAD ONE
     outside:
 
@@ -82,7 +82,7 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
         JPOS set
             SUB 0
-        JMP outside
+        JUMP outside
     set:    LOAD ONE
     outside:
 
@@ -93,7 +93,7 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
         JPOS set
             SUB 0
-        JMP outside
+        JUMP outside
     set:    LOAD ONE
     outside:
 
@@ -104,7 +104,7 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
         JNEG set
             INC # zamiast SUB 0 (jak będzie zero, to INC zrobi jedynkę)
-        JMP outside
+        JUMP outside
      set:   SUB 0
      outside:
 
@@ -134,7 +134,7 @@ Expression: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         STORE TMP2
         ## uruchom value1 ##
 
-        JMP cond
+        JUMP cond
 
 cntnt:  STORE TMP2
         LOAD TMP1
@@ -151,7 +151,7 @@ cond:   STORE TMP1
 
     e) DivExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać DIV
         // TODO
-    f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać DIV
+    f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać MOD
         // TODO
 
 Command: NADPISUJE REJESTRY: wszystkie rejestry komend
@@ -168,7 +168,7 @@ Command: NADPISUJE REJESTRY: wszystkie rejestry komend
         ## uruchom condition ##
         JPOS cntnt
         ## uruchom każdą else command ##
-        JMP outside
+        JUMP outside
 cntnt:  ## uruchom każdą if command ##
 outside:
 
@@ -176,13 +176,13 @@ outside:
 
         ## uruchom condition ##
         JPOS cntnt
-        JMP outside
+        JUMP outside
 cntnt:  ## uruchom każdą if command ##
 outside:
 
     d) WhileCommand NADPISUJE REJESTRY: wszystkie rejestry komend
 
-        JMP cond
+        JUMP cond
 cntnt:  ## uruchom każdą command ##
 cond:   ## uruchom condition ##
         JPOS cntnt
@@ -207,7 +207,7 @@ cntnt: ## uruchom każdą command ##
        STORE &iterator // zapamiętujesz początek
        // w akumulatorze masz nadal początek pętli
 
-       JMP cond
+       JUMP cond
 
 cntnt: INC // trik, zamiast JNEG my chcemy JNEG + JZERO (gdy iterator jest równy końcowi pętli, to powinna się ona wykonać)
            // dlatego przez JNEG odejmujemy jedynkę, a po skoku ją dodajemy
@@ -229,7 +229,7 @@ cond:  SUB &iterator+1
            ## uruchom value1 ##
            STORE &iterator
 
-           JMP cond
+           JUMP cond
 
     cntnt: DEC
            ## uruchom każdą command ##
@@ -260,7 +260,7 @@ Dodatkowe operacje:
 generateConstant(const) - umieszcza wartość stałej const (np. 7) w ACC, NADPISUJE REJESTRY: ACC
 setOneRegister() - generuje wartość 1 i umieszcza w specjalnym rejestrze ONE
 
-generateConstant(const) { // TODO! UJEMNE (będzie if, ale w Javie, po prostu załadujesz -1, a nie 1, a potem dodawał
+generateConstant(const) { // TODO: trzeba poprawić, za wolne
     LOAD ONE
     SHIFT ONE # mnóż ACC przez 2^1 tak długo, aż przekroczysz stałą (w Javie)
     .
@@ -281,3 +281,6 @@ setOneRegister() {
     INC
     STORE ONE
 }
+
+Etykiety - ponieważ nie zawsze wiemy, ile linii zostanie wygenerowanych, wprowadzamy etykiety, które w postprocessingu
+usuwamy i zastępujemy

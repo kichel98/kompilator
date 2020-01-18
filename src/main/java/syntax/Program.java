@@ -38,9 +38,11 @@ public class Program implements SyntaxElement {
 
     @Override
     public void accept(Visitor v) {
-        this.declarations.forEach(declaration -> {
-            declaration.accept(v);
-        });
+        if (this.declarations != null) {
+            this.declarations.forEach(declaration -> {
+                declaration.accept(v);
+            });
+        }
         v.preVisit(this);
         this.commands.forEach(command -> {
             command.accept(v);

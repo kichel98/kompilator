@@ -20,6 +20,6 @@ public class ValueExpression implements Expression {
 
     @Override
     public void accept(Visitor visitor) {
-
+        value.accept(visitor);
     }
 }

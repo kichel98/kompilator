@@ -31,6 +31,9 @@ public class AssignCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        id.accept(visitor);
+        visitor.inVisit(this);
+        expr.accept(visitor);
+        visitor.postVisit(this);
     }
 }

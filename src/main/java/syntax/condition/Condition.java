@@ -5,7 +5,7 @@ import syntax.SyntaxElement;
 import syntax.value.Value;
 
 public abstract class Condition implements SyntaxElement {
-    private Value val1, val2;
+    protected Value val1, val2;
     private int type;
 
     public Condition(Value val1, Value val2, int type) {
@@ -39,6 +39,8 @@ public abstract class Condition implements SyntaxElement {
 
     @Override
     public void accept(Visitor visitor) {
-
+        val2.accept(visitor);
+        visitor.preVisit(this);
+        visitor.inVisit(this);
     }
 }

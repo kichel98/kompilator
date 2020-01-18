@@ -32,6 +32,11 @@ public class IfCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        cond.accept(visitor);
+        String label = visitor.inVisit(this);
+        ifCmdList.forEach(command -> {
+            command.accept(visitor);
+        });
+        visitor.postVisit(this, label);
     }
 }

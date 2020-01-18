@@ -42,6 +42,15 @@ public class IfElseCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        cond.accept(visitor);
+        String contentLabel = visitor.firstInVisit(this);
+        elseCmdList.forEach(elseCmd -> {
+            elseCmd.accept(visitor);
+        });
+        String outsideLabel = visitor.secondInVisit(this, contentLabel);
+        ifCmdList.forEach(ifCmd -> {
+            ifCmd.accept(visitor);
+        });
+        visitor.postVisit(this, outsideLabel);
     }
 }

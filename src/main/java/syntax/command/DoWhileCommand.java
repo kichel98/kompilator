@@ -32,6 +32,9 @@ public class DoWhileCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        String label = visitor.preVisit(this);
+        cmdList.forEach(cmd -> cmd.accept(visitor));
+        cond.accept(visitor);
+        visitor.postVisit(this, label);
     }
 }

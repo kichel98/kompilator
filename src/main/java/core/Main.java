@@ -19,6 +19,7 @@ import syntax.Program;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Main {
     static public void main(String[] argv) {
@@ -27,10 +28,21 @@ public class Main {
             parser p = new parser(new Lexer(new FileReader(argv[0]), symbolFactory), symbolFactory);
             Program result = (Program) p.parse().value;
 
-            PrintWriter writer = new PrintWriter(argv[1]);
-            MainVisitor visitor = new MainVisitor(writer);
+            StringWriter outputWithLabels = new StringWriter();
+            PrintWriter writerToString = new PrintWriter(outputWithLabels);
+            MainVisitor visitor = new MainVisitor(writerToString);
             result.accept(visitor);
-            writer.close();
+            writerToString.close();
+
+//            System.out.println(outputWithLabels.toString());
+
+            PostProcessor postProcessor = new PostProcessor();
+            String outputWithoutLabels = postProcessor.postProcess(outputWithLabels.toString());
+
+            PrintWriter writerToFile = new PrintWriter(argv[1]);
+            writerToFile.print(outputWithoutLabels);
+            writerToFile.close();
+
         } catch (ArrayIndexOutOfBoundsException e) {
             printUsage();
         } catch (FileNotFoundException e) { // changed from IOException

@@ -1,20 +1,22 @@
 package core;
 
 import syntax.Program;
-import syntax.command.ReadCommand;
-import syntax.command.WriteCommand;
+import syntax.command.*;
+import syntax.condition.*;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
+import syntax.expression.AddExpression;
+import syntax.expression.SubExpression;
 import syntax.identifier.ArrConstIdentifier;
 import syntax.identifier.ArrVarIdentifier;
 import syntax.identifier.VarIdentifier;
 import syntax.value.IdentValue;
 import syntax.value.NumValue;
-import syntax.value.Value;
 
 import java.io.PrintWriter;
 
 import static core.AssemblerPrinter.*;
+import static core.Memory.Register.*;
 
 public class MainVisitor implements Visitor {
 
@@ -27,6 +29,7 @@ public class MainVisitor implements Visitor {
     @Override
     public void preVisit(Program p) {
         setOneRegister();
+        setMinusOneRegister();
     }
 
     @Override
@@ -60,15 +63,15 @@ public class MainVisitor implements Visitor {
     public void visit(ArrVarIdentifier arrVarIdentifier) {
         Long arrayIndex = memory.getIndexOfArrayStart(arrVarIdentifier);
         generateConstant(arrayIndex);
-        STORE(Memory.Register.TMP1);
+        STORE(TMP1);
         Long offsetIndex = memory.getIndexOfVar(arrVarIdentifier.getVarIndex());
         LOAD(offsetIndex);
-        ADD(Memory.Register.TMP1);
+        ADD(TMP1);
     }
 
     @Override
     public void visit(IdentValue identValue) {
-        LOADI(Memory.Register.ACC);
+        LOADI(ACC);
     }
 
     @Override
@@ -78,9 +81,9 @@ public class MainVisitor implements Visitor {
 
     @Override
     public void visit(ReadCommand readCommand) {
-        STORE(Memory.Register.TMP1);
+        STORE(TMP1);
         GET();
-        STOREI(Memory.Register.TMP1);
+        STOREI(TMP1);
     }
 
     @Override
@@ -88,24 +91,222 @@ public class MainVisitor implements Visitor {
         PUT();
     }
 
+    @Override
+    public void inVisit(AssignCommand assignCommand) {
+        STORE(TMP3);
+    }
+
+    @Override
+    public void postVisit(AssignCommand assignCommand) {
+        STOREI(TMP3);
+    }
+
+    @Override
+    public String inVisit(IfCommand ifCommand) {
+        String contentLabel = "ifcntnt" + getLabelCounterAndThenIncrement();
+        JPOS(contentLabel);
+        String outsideLabel = "ifout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(contentLabel);
+        return outsideLabel;
+    }
+
+    @Override
+    public void postVisit(IfCommand ifCommand, String outsideLabel) {
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public String firstInVisit(IfElseCommand ifElseCommand) {
+        String contentLabel = "ifelcntnt" + getLabelCounterAndThenIncrement();
+        JPOS(contentLabel);
+        return contentLabel;
+    }
+
+    @Override
+    public String secondInVisit(IfElseCommand ifElseCommand, String contentLabel) {
+        String outsideLabel = "ifelout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(contentLabel);
+        return outsideLabel;
+    }
+
+    @Override
+    public void postVisit(IfElseCommand ifElseCommand, String outsideLabel) {
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public String[] preVisit(WhileCommand whileCommand) {
+        String conditionLabel = "whilecnd" + getLabelCounterAndThenIncrement();
+        JUMP(conditionLabel);
+        String contentLabel = "whilecntnt" + getLabelCounterAndThenIncrement();
+        printLabel(contentLabel);
+        return new String[] {conditionLabel, contentLabel};
+    }
+
+    @Override
+    public String inVisit(WhileCommand whileCommand, String[] labels) {
+        printLabel(labels[0]);
+        return labels[1];
+    }
+
+    @Override
+    public void postVisit(WhileCommand whileCommand, String label) {
+        JPOS(label);
+    }
+
+    @Override
+    public String preVisit(DoWhileCommand doWhileCommand) {
+        String contentLabel = "dowhilecntnt" + getLabelCounterAndThenIncrement();
+        printLabel(contentLabel);
+        return contentLabel;
+    }
+
+    @Override
+    public void postVisit(DoWhileCommand doWhileCommand, String label) {
+        JPOS(label);
+    }
+
+    @Override
+    public void inVisit(AddExpression addExpression) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void postVisit(AddExpression addExpression) {
+        ADD(TMP2);
+    }
+
+    @Override
+    public void inVisit(SubExpression subExpression) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void postVisit(SubExpression subExpression) {
+        SUB(TMP2);
+    }
+
+    @Override
+    public void preVisit(Condition condition) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void inVisit(Condition condition) {
+        SUB(TMP2);
+    }
+
+    @Override
+    public void inVisit(EqCondition condition) {
+        String setLabel = "eqset" + getLabelCounterAndThenIncrement();
+        JZERO(setLabel);
+        SUB(0L);
+        String outsideLabel = "eqout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(setLabel);
+        INC();
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public void inVisit(NeqCondition condition) {
+        String outsideLabel = "neqout" + getLabelCounterAndThenIncrement();
+        JZERO(outsideLabel);
+        LOAD(ONE);
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public void inVisit(LeCondition condition) {
+        String setLabel = "leset" + getLabelCounterAndThenIncrement();
+        JNEG(setLabel);
+        SUB(0L);
+        String outsideLabel = "leout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(setLabel);
+        LOAD(ONE);
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public void inVisit(GeCondition condition) {
+        String setLabel = "geset" + getLabelCounterAndThenIncrement();
+        JPOS(setLabel);
+        SUB(0L);
+        String outsideLabel = "geout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(setLabel);
+        LOAD(ONE);
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public void inVisit(LeqCondition condition) {
+        String setLabel = "leqset" + getLabelCounterAndThenIncrement();
+        JPOS(setLabel);
+        SUB(0L);
+        String outsideLabel = "leqout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(setLabel);
+        LOAD(ONE);
+        printLabel(outsideLabel);
+    }
+
+    @Override
+    public void inVisit(GeqCondition condition) {
+        // TODO: ZEPSUTY!!!!!!!!!!!!!
+        String setLabel = "geqset" + getLabelCounterAndThenIncrement();
+        JNEG(setLabel);
+        INC();
+        String outsideLabel = "geqout" + getLabelCounterAndThenIncrement();
+        JUMP(outsideLabel);
+        printLabel(setLabel);
+        SUB(0L);
+        printLabel(outsideLabel);
+    }
+
 
     private void setOneRegister() {
         SUB(0L);
         INC();
-        STORE(Memory.Register.ONE);
+        STORE(ONE);
+    }
+
+    private void setMinusOneRegister() {
+        SUB(0L);
+        DEC();
+        STORE(MINUSONE);
     }
 
 
     private void generateConstant(Long constant) {
-        LOAD(Memory.Register.ONE);
-        Long asmValue = 1L;
-        while (asmValue < constant) {
-            SHIFT(Memory.Register.ONE);
-            asmValue *= 2;
+        if (constant > 0) {
+            LOAD(ONE);
+            Long asmValue = 1L;
+            while (asmValue < constant) {
+                SHIFT(ONE);
+                asmValue *= 2;
+            }
+            while (asmValue > constant) {
+                DEC();
+                asmValue--;
+            }
+        } else if (constant < 0) {
+            LOAD(MINUSONE);
+            Long asmValue = -1L;
+            while (asmValue > constant) {
+                SHIFT(ONE);
+                asmValue *= 2;
+            }
+            while (asmValue < constant) {
+                INC();
+                asmValue++;
+            }
+        } else {
+            SUB(0L);
         }
-        while (asmValue > constant) {
-            DEC();
-            asmValue--;
-        }
+
     }
 }

@@ -23,7 +23,8 @@ public class Memory {
         TMP1(1L),
         TMP2(2L),
         TMP3(3L),
-        ONE(4L);
+        ONE(4L),
+        MINUSONE(5L);
 
         Long idx;
 
