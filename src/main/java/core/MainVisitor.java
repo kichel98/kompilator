@@ -18,12 +18,13 @@ import java.io.PrintWriter;
 import static core.AssemblerPrinter.*;
 import static core.Memory.Register.*;
 
-public class MainVisitor implements Visitor {
+public class MainVisitor extends Visitor {
 
-    private Memory memory = new Memory();
+    private Memory memory;
 
-    public MainVisitor(PrintWriter writer) {
+    public MainVisitor(PrintWriter writer, Memory memory) {
         new AssemblerPrinter(writer);
+        this.memory = memory;
     }
 
     @Override
@@ -169,6 +170,68 @@ public class MainVisitor implements Visitor {
     }
 
     @Override
+    public void firstInVisit(ForToCommand forToCommand) {
+        Long endIndex = memory.getIndexOfVar(forToCommand.getCounter()) + 1;
+        STORE(endIndex);
+    }
+
+    @Override
+    public String[] secondInVisit(ForToCommand forToCommand) {
+        Long startIndex = memory.getIndexOfVar(forToCommand.getCounter());
+        STORE(startIndex);
+        String conditionLabel = "forcond" + getLabelCounterAndThenIncrement();
+        JUMP(conditionLabel);
+        String contentLabel = "forcntnt" + getLabelCounterAndThenIncrement();
+        printLabel(contentLabel);
+        INC();
+        return new String[] {conditionLabel, contentLabel};
+    }
+
+    @Override
+    public void postVisit(ForToCommand forToCommand, String[] labels) {
+        Long startIndex = memory.getIndexOfVar(forToCommand.getCounter());
+        LOAD(startIndex);
+        INC();
+        STORE(startIndex);
+        printLabel(labels[0]);
+        Long endIndex = startIndex + 1;
+        SUB(endIndex);
+        DEC();
+        JNEG(labels[1]);
+    }
+
+    @Override
+    public void firstInVisit(ForDownToCommand forDownToCommand) {
+        Long endIndex = memory.getIndexOfVar(forDownToCommand.getCounter()) + 1;
+        STORE(endIndex);
+    }
+
+    @Override
+    public String[] secondInVisit(ForDownToCommand forDownToCommand) {
+        Long startIndex = memory.getIndexOfVar(forDownToCommand.getCounter());
+        STORE(startIndex);
+        String conditionLabel = "forcond" + getLabelCounterAndThenIncrement();
+        JUMP(conditionLabel);
+        String contentLabel = "forcntnt" + getLabelCounterAndThenIncrement();
+        printLabel(contentLabel);
+        DEC();
+        return new String[] {conditionLabel, contentLabel};
+    }
+
+    @Override
+    public void postVisit(ForDownToCommand forDownToCommand, String[] labels) {
+        Long startIndex = memory.getIndexOfVar(forDownToCommand.getCounter());
+        LOAD(startIndex);
+        DEC();
+        STORE(startIndex);
+        printLabel(labels[0]);
+        Long endIndex = startIndex + 1;
+        SUB(endIndex);
+        INC();
+        JPOS(labels[1]);
+    }
+
+    @Override
     public void inVisit(AddExpression addExpression) {
         STORE(TMP2);
     }
@@ -256,7 +319,6 @@ public class MainVisitor implements Visitor {
 
     @Override
     public void inVisit(GeqCondition condition) {
-        // TODO: ZEPSUTY!!!!!!!!!!!!!
         String setLabel = "geqset" + getLabelCounterAndThenIncrement();
         JNEG(setLabel);
         INC();

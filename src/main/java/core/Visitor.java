@@ -13,48 +13,55 @@ import syntax.identifier.VarIdentifier;
 import syntax.value.IdentValue;
 import syntax.value.NumValue;
 
-public interface Visitor {
-    void preVisit(Program p);
-    void postVisit(Program p);
+public abstract class Visitor {
+    public void preVisit(Program p) {}
+    public void postVisit(Program p) {}
 
-    void visit(VarDeclaration varDeclaration);
-    void visit(ArrDeclaration arrDeclaration);
+    public void visit(VarDeclaration varDeclaration) {}
+    public void visit(ArrDeclaration arrDeclaration) {}
 
-    void visit(VarIdentifier varIdentifier);
-    void visit(ArrConstIdentifier arrConstIdentifier);
-    void visit(ArrVarIdentifier arrVarIdentifier);
+    public void visit(VarIdentifier varIdentifier) {}
+    public void visit(ArrConstIdentifier arrConstIdentifier) {}
+    public void visit(ArrVarIdentifier arrVarIdentifier) {}
 
-    void visit(IdentValue identValue);
-    void visit(NumValue identValue);
+    public void visit(IdentValue identValue) {}
+    public void visit(NumValue identValue) {}
 
-    void visit(ReadCommand readCommand);
-    void visit(WriteCommand writeCommand);
-    void inVisit(AssignCommand assignCommand);
-    void postVisit(AssignCommand assignCommand);
-    String inVisit(IfCommand ifCommand);
-    void postVisit(IfCommand ifCommand, String label);
-    String firstInVisit(IfElseCommand ifElseCommand);
-    String secondInVisit(IfElseCommand ifElseCommand, String label);
-    void postVisit(IfElseCommand ifElseCommand, String label);
-    String[] preVisit(WhileCommand whileCommand);
-    String inVisit(WhileCommand whileCommand, String[] labels);
-    void postVisit(WhileCommand whileCommand, String label);
-    String preVisit(DoWhileCommand doWhileCommand);
-    void postVisit(DoWhileCommand doWhileCommand, String label);
+    public void visit(ReadCommand readCommand) {}
+    public void visit(WriteCommand writeCommand) {}
+    public void inVisit(AssignCommand assignCommand) {}
+    public void postVisit(AssignCommand assignCommand) {}
+    public String inVisit(IfCommand ifCommand) { return null; }
+    public void postVisit(IfCommand ifCommand, String label) {}
+    public String firstInVisit(IfElseCommand ifElseCommand) { return null; }
+    public String secondInVisit(IfElseCommand ifElseCommand, String label) { return null; }
+    public void postVisit(IfElseCommand ifElseCommand, String label) {}
+    public String[] preVisit(WhileCommand whileCommand) { return null; }
+    public String inVisit(WhileCommand whileCommand, String[] labels) { return null; }
+    public void postVisit(WhileCommand whileCommand, String label) {}
+    public String preVisit(DoWhileCommand doWhileCommand) { return null; }
+    public void postVisit(DoWhileCommand doWhileCommand, String label) {}
+    public void firstInVisit(ForToCommand forToCommand) {}
+    public String[] secondInVisit(ForToCommand forToCommand) { return null; }
+    public void postVisit(ForToCommand forToCommand, String[] labels) {}
+    public void firstInVisit(ForDownToCommand forDownToCommand) {}
+    public String[] secondInVisit(ForDownToCommand forDownToCommand) { return null; }
+    public void postVisit(ForDownToCommand forDownToCommand, String[] labels) {}
 
-    void inVisit(AddExpression addExpression);
-    void postVisit(AddExpression addExpression);
-    void inVisit(SubExpression subExpression);
-    void postVisit(SubExpression subExpression);
 
-    void preVisit(Condition condition);
-    void inVisit(Condition condition);
-    void inVisit(EqCondition condition);
-    void inVisit(NeqCondition condition);
-    void inVisit(GeCondition condition);
-    void inVisit(GeqCondition condition);
-    void inVisit(LeCondition condition);
-    void inVisit(LeqCondition condition);
+    public void inVisit(AddExpression addExpression) {}
+    public void postVisit(AddExpression addExpression) {}
+    public void inVisit(SubExpression subExpression) {}
+    public void postVisit(SubExpression subExpression) {}
+
+    public void preVisit(Condition condition) {}
+    public void inVisit(Condition condition) {}
+    public void inVisit(EqCondition condition) {}
+    public void inVisit(NeqCondition condition) {}
+    public void inVisit(GeCondition condition) {}
+    public void inVisit(GeqCondition condition) {}
+    public void inVisit(LeCondition condition) {}
+    public void inVisit(LeqCondition condition) {}
 
 
 }

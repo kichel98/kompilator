@@ -40,10 +40,18 @@ public class Memory {
     public void addVarToMemory(VarDeclaration decl) {
         memory.put(decl.getName(), new MutablePair<>(decl, endIndex++));
     }
+    public void addLocalIteratorToMemory(String counterName) {
+        VarDeclaration counterDecl = new VarDeclaration(counterName);
+        if (!memory.containsKey(counterName)) { // jeśli taka sama nazwa już była, to nic nie musimy robić, jakby "nadpisujemy"
+            memory.put(counterName, new MutablePair<>(counterDecl, endIndex));
+            endIndex += 2; // robimy miejsce na zapisanie końca iteracji (value po "TO")
+        }
+    }
     public void addArrToMemory(ArrDeclaration decl) {
         memory.put(decl.getName(), new MutablePair<>(decl, endIndex));
         endIndex += decl.getEndIndex() - decl.getStartIndex() + 1;
     }
+
 
     public Long getIndexOfVar(String varName) {
         return memory.get(varName).getRight();
@@ -58,4 +66,5 @@ public class Memory {
         Long index = memory.get(id.getName()).getRight();
         return index - ((ArrDeclaration) (memory.get(id.getName()).getLeft())).getStartIndex();
     }
+
 }

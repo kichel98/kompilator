@@ -1,9 +1,6 @@
 package utils;
 
-import core.Lexer;
-import core.Main;
-import core.MainVisitor;
-import core.Visitor;
+import core.*;
 import cup11b.parser;
 import java_cup.runtime.ComplexSymbolFactory;
 import syntax.Program;
@@ -42,7 +39,8 @@ public class TestUtils {
     public static WriterWithVisitor prepareVisitorTest() {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        MainVisitor visitor = new MainVisitor(printWriter);
+        Memory memory = new Memory();
+        MainVisitor visitor = new MainVisitor(printWriter, memory);
         return new WriterWithVisitor(printWriter, visitor);
     }
 
@@ -55,7 +53,8 @@ public class TestUtils {
     public static WriterWithVisitor getVisitorAndWriterInstance() {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        MainVisitor visitor = new MainVisitor(printWriter);
+        Memory memory = new Memory();
+        MainVisitor visitor = new MainVisitor(printWriter, memory);
         return new WriterWithVisitor(stringWriter, visitor);
     }
 

@@ -30,8 +30,11 @@ public class Main {
 
             StringWriter outputWithLabels = new StringWriter();
             PrintWriter writerToString = new PrintWriter(outputWithLabels);
-            MainVisitor visitor = new MainVisitor(writerToString);
-            result.accept(visitor);
+            Memory memory = new Memory();
+            ForVisitor forVisitor = new ForVisitor(memory);
+            result.accept(forVisitor);
+            MainVisitor mainVisitor = new MainVisitor(writerToString, memory);
+            result.accept(mainVisitor);
             writerToString.close();
 
 //            System.out.println(outputWithLabels.toString());

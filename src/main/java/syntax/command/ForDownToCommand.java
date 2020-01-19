@@ -51,6 +51,11 @@ public class ForDownToCommand implements Command {
 
     @Override
     public void accept(Visitor visitor) {
-
+        endIndex.accept(visitor);
+        visitor.firstInVisit(this);
+        startIndex.accept(visitor);
+        String[] labels = visitor.secondInVisit(this);
+        cmdList.forEach(cmd -> cmd.accept(visitor));
+        visitor.postVisit(this, labels);
     }
 }
