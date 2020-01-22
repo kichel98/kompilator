@@ -6,6 +6,7 @@ import syntax.condition.*;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
 import syntax.expression.AddExpression;
+import syntax.expression.MulExpression;
 import syntax.expression.SubExpression;
 import syntax.identifier.ArrConstIdentifier;
 import syntax.identifier.ArrVarIdentifier;
@@ -51,19 +52,19 @@ public class MainVisitor extends Visitor {
     @Override
     public void visit(VarIdentifier varIdentifier) {
         Long index = memory.getIndexOfVar(varIdentifier.getName());
-        generateConstant(index);
+        generateConstantFaster(index);
     }
 
     @Override
     public void visit(ArrConstIdentifier arrConstIdentifier) {
         Long index = memory.getIndexOfArrayElement(arrConstIdentifier);
-        generateConstant(index);
+        generateConstantFaster(index);
     }
 
     @Override
     public void visit(ArrVarIdentifier arrVarIdentifier) {
         Long arrayIndex = memory.getIndexOfArrayStart(arrVarIdentifier);
-        generateConstant(arrayIndex);
+        generateConstantFaster(arrayIndex);
         STORE(TMP1);
         Long offsetIndex = memory.getIndexOfVar(arrVarIdentifier.getVarIndex());
         LOAD(offsetIndex);
@@ -77,7 +78,7 @@ public class MainVisitor extends Visitor {
 
     @Override
     public void visit(NumValue numValue) {
-        generateConstant(numValue.getNumConst());
+        generateConstantFaster(numValue.getNumConst());
     }
 
     @Override
@@ -143,7 +144,7 @@ public class MainVisitor extends Visitor {
         JUMP(conditionLabel);
         String contentLabel = "whilecntnt" + getLabelCounterAndThenIncrement();
         printLabel(contentLabel);
-        return new String[] {conditionLabel, contentLabel};
+        return new String[]{conditionLabel, contentLabel};
     }
 
     @Override
@@ -184,7 +185,7 @@ public class MainVisitor extends Visitor {
         String contentLabel = "forcntnt" + getLabelCounterAndThenIncrement();
         printLabel(contentLabel);
         INC();
-        return new String[] {conditionLabel, contentLabel};
+        return new String[]{conditionLabel, contentLabel};
     }
 
     @Override
@@ -215,7 +216,7 @@ public class MainVisitor extends Visitor {
         String contentLabel = "forcntnt" + getLabelCounterAndThenIncrement();
         printLabel(contentLabel);
         DEC();
-        return new String[] {conditionLabel, contentLabel};
+        return new String[]{conditionLabel, contentLabel};
     }
 
     @Override
@@ -249,6 +250,72 @@ public class MainVisitor extends Visitor {
     @Override
     public void postVisit(SubExpression subExpression) {
         SUB(TMP2);
+    }
+
+    @Override
+    public void preVisit(MulExpression mulExpression) {
+        SUB(0L);
+        STORE(MUL1);
+        STORE(MUL2);
+    }
+
+    @Override
+    public void inVisit(MulExpression mulExpression) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void postVisit(MulExpression mulExpression) {
+        /*
+            n - TMP1
+            m - TMP2
+            ans - MUL1
+            count - MUL2
+         */
+        STORE(TMP1);
+        LOAD(TMP2);
+        STORE(TMP2);
+
+        String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
+        String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
+        JUMP(whileCnd);
+        printLabel(whileCntnt);
+        /*
+         środek pętli
+        */
+            LOAD(TMP2);
+            SHIFT(MINUSONE);
+            SHIFT(ONE);
+            SUB(TMP2);
+
+            String ifCntnt = "ifcntnt" + getLabelCounterAndThenIncrement();
+            JNEG(ifCntnt);
+            String ifOutside = "ifout" + getLabelCounterAndThenIncrement();
+            JUMP(ifOutside);
+            printLabel(ifCntnt);
+                /* if start */
+                LOAD(TMP1);
+                SHIFT(MUL2);
+                ADD(MUL1);
+                STORE(MUL1);
+                /* if end*/
+            printLabel(ifOutside);
+
+            LOAD(MUL2);
+            INC();
+            STORE(MUL2);
+            LOAD(TMP2);
+            SHIFT(MINUSONE);
+            STORE(TMP2);
+
+        /*
+        koniec pętli
+         */
+        printLabel(whileCnd);
+        JPOS(whileCntnt);
+
+        LOAD(MUL1);
+
     }
 
     @Override
@@ -309,11 +376,11 @@ public class MainVisitor extends Visitor {
     public void inVisit(LeqCondition condition) {
         String setLabel = "leqset" + getLabelCounterAndThenIncrement();
         JPOS(setLabel);
-        SUB(0L);
+        LOAD(ONE);
         String outsideLabel = "leqout" + getLabelCounterAndThenIncrement();
         JUMP(outsideLabel);
         printLabel(setLabel);
-        LOAD(ONE);
+        SUB(0L);
         printLabel(outsideLabel);
     }
 
@@ -370,5 +437,21 @@ public class MainVisitor extends Visitor {
             SUB(0L);
         }
 
+    }
+
+    private void generateConstantFaster(Long constant) {
+        String binConst = Long.toBinaryString(constant);
+
+        SUB(0L);
+
+        char[] charArray = binConst.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            char c = charArray[i];
+            if (c == '1') {
+                INC();
+            }
+            if (i != charArray.length - 1)
+                SHIFT(ONE);
+        }
     }
 }

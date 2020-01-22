@@ -6,6 +6,7 @@ import syntax.condition.*;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
 import syntax.expression.AddExpression;
+import syntax.expression.MulExpression;
 import syntax.expression.SubExpression;
 import syntax.identifier.ArrConstIdentifier;
 import syntax.identifier.ArrVarIdentifier;
@@ -53,6 +54,10 @@ public abstract class Visitor {
     public void postVisit(AddExpression addExpression) {}
     public void inVisit(SubExpression subExpression) {}
     public void postVisit(SubExpression subExpression) {}
+    public void preVisit(MulExpression mulExpression) {}
+    public void inVisit(MulExpression mulExpression) {}
+    public void postVisit(MulExpression mulExpression) {}
+
 
     public void preVisit(Condition condition) {}
     public void inVisit(Condition condition) {}

@@ -24,7 +24,9 @@ public class Memory {
         TMP2(2L),
         TMP3(3L),
         ONE(4L),
-        MINUSONE(5L);
+        MINUSONE(5L),
+        MUL1(6L),
+        MUL2(7L);
 
         Long idx;
 

@@ -11,7 +11,6 @@ public class GeqCondition extends Condition {
     @Override
     public void accept(Visitor visitor) {
         super.accept(visitor);
-        val1.accept(visitor);
         visitor.inVisit(this);
 
     }

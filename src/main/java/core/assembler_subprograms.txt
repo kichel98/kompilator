@@ -92,9 +92,9 @@ Condition: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         ## uruchom value1 ##
         SUB TMP2
         JPOS set
-            SUB 0
+            LOAD ONE
         JUMP outside
-    set:    LOAD ONE
+    set:    SUB 0
     outside:
 
      f) GeqCondition NADPISUJE REJESTRY: ACC, TMP1, TMP2
@@ -128,8 +128,9 @@ Expression: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         SUB TMP2
 
     d) MulExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2
-        // TODO: dokończyć, bo jeszcze nie działa (możliwe, że mnożnik trzeba ++ lub --)
-        // TODO: ujemne i 0!
+        // geeksforgeeks.org/multiplication-two-numbers-shift-operator/
+        // TODO: ujemne!
+        // TODO: tak jak w GFG, nie tak jak niżej, uaktualnij
         ## uruchom value2 ##
         STORE TMP2
         ## uruchom value1 ##
@@ -260,7 +261,8 @@ Dodatkowe operacje:
 generateConstant(const) - umieszcza wartość stałej const (np. 7) w ACC, NADPISUJE REJESTRY: ACC
 setOneRegister() - generuje wartość 1 i umieszcza w specjalnym rejestrze ONE
 
-generateConstant(const) { // TODO: trzeba poprawić, za wolne
+generateConstant(const) { // TODO: zostało zmienione, opisz zmiany
+    // TODO: dla ujemnych nie będzie działać na maszynie dużych liczb
     LOAD ONE
     SHIFT ONE # mnóż ACC przez 2^1 tak długo, aż przekroczysz stałą (w Javie)
     .

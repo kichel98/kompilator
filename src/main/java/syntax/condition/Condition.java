@@ -41,6 +41,7 @@ public abstract class Condition implements SyntaxElement {
     public void accept(Visitor visitor) {
         val2.accept(visitor);
         visitor.preVisit(this);
+        val1.accept(visitor);
         visitor.inVisit(this);
     }
 }

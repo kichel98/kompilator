@@ -1,0 +1,14 @@
+0-div-mod.imp - DIV MOD
+00-div-mod.imp - DIV MOD
+1-numbers.imp - DIV
+2-fib.imp - DZIAŁA!
+3-fib-factorial.imp - DZIAŁA!
+4-factorial.imp - MOD 2
+5-tab.imp - DZIAŁA!
+6-mod-mult.imp - MOD
+7-loopiii.imp - DZIAŁA!
+8-for.imp - DZIAŁA!
+9-sort.imp - MOD
+program0.imp - DIV
+program1.imp - DZIAŁA!
+program2.imp - MOD DIV
