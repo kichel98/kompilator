@@ -32,8 +32,10 @@ public class PostProcessor {
             String line = lines.get(i);
             if (lines.get(i).contains(":")) {
                 List<String> parts = new LinkedList<>(Arrays.asList(line.split(":")));
-                labelToCounter.put(parts.get(0), i);
-                lines.set(i, parts.get(1).trim());
+                for (int j = 0; j < parts.size() - 1; j++) { // wiele etykiet w jednej linii
+                    labelToCounter.put(parts.get(j).trim(), i);
+                }
+                lines.set(i, parts.get(parts.size() - 1).trim());
             }
         }
     }

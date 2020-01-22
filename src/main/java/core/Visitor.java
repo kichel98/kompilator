@@ -5,9 +5,7 @@ import syntax.command.*;
 import syntax.condition.*;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
-import syntax.expression.AddExpression;
-import syntax.expression.MulExpression;
-import syntax.expression.SubExpression;
+import syntax.expression.*;
 import syntax.identifier.ArrConstIdentifier;
 import syntax.identifier.ArrVarIdentifier;
 import syntax.identifier.VarIdentifier;
@@ -57,7 +55,12 @@ public abstract class Visitor {
     public void preVisit(MulExpression mulExpression) {}
     public void inVisit(MulExpression mulExpression) {}
     public void postVisit(MulExpression mulExpression) {}
-
+    public void preVisit(DivExpression divExpression) {}
+    public void inVisit(DivExpression divExpression) {}
+    public void postVisit(DivExpression divExpression) {}
+    public void preVisit(ModExpression modExpression) {}
+    public void inVisit(ModExpression modExpression) {}
+    public void postVisit(ModExpression modExpression) {}
 
     public void preVisit(Condition condition) {}
     public void inVisit(Condition condition) {}

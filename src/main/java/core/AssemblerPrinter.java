@@ -10,7 +10,6 @@ public class AssemblerPrinter {
     }
 
     static int getLabelCounterAndThenIncrement() { return labelCounter++; }
-
     static void printLabel(String label) {
         writer.print(label + ": ");
     }
@@ -95,7 +94,4 @@ public class AssemblerPrinter {
     static void HALT() {
         writer.print("HALT" + "\n");
     }
-
-
-
 }

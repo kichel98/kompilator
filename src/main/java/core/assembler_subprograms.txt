@@ -127,9 +127,9 @@ Expression: NADPISUJE REJESTRY: ACC, TMP1, TMP2
         ## uruchom value1 ##
         SUB TMP2
 
-    d) MulExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2
+    d) MulExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2, MUL1, MUL2
         // geeksforgeeks.org/multiplication-two-numbers-shift-operator/
-        // TODO: ujemne!
+        // TODO: ujemne! (działa, gdy pierwsza liczba ujemna, nie działa, gdy druga)
         // TODO: tak jak w GFG, nie tak jak niżej, uaktualnij
         ## uruchom value2 ##
         STORE TMP2
@@ -150,10 +150,99 @@ cond:   STORE TMP1
 
         while( tmp2 > 0) add ACC; STORE TMP1; LOAD TMP2; DEC; STORE TMP2; LOAD TMP1;
 
-    e) DivExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać DIV
-        // TODO
+    e) DivExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2, MUL1, MUL2, MUL3
+        // TODO ujemne
+        Algorytm:
+        dzielenie pisemne na binarce
+        Najpierw wyznaczamy count - zmienną, która mówi ile maksymalnie razy jesteśmy w stanie
+        zrobić shifta na dzielniku, żeby nie przekroczyć dzielnej.
+        Potem w pętli od count do 0 (iterator i)
+            - sprawdzamy, czy od a można odjąć b przesunięte o i
+            jeśli tak, to to robimy, a do wyniku dodajemy jedynkę i go przesuwamy
+            jeśli nie, to nie odejmujemy, jedynie przesuwamy wynik
+        Na końcu trzeba tylko cofnąć shifta po ostatnim obiegu, żeby dostać prawidłowy wynik
+
+        Pseudokod:
+
+        zmienne: a, b, count = 0, wynik = 0
+
+        while( (b << count) <= a ) {
+            count++;
+        }
+        count--;
+
+        for i from count downto 0 {
+            if((b << i) <= a) { // a >= (b << i)
+                a -= b << i;
+                wynik++;
+                wynik = wynik << 1;
+            } else {
+                wynik = wynik << 1;
+            }
+        }
+
+        wynik = wynik >> 1; // napraw po ostatnim shifcie
+
+        return wynik
+
+        Assembler:
+            /*  a - TMP1
+                b - TMP2
+                count and i - MUL1
+                wynik - MUL2
+                temp - MUL3
+            */
+
+
+            // ustaw count i wynik na zero
+
+            JUMP whilecnd
+whilecntnt: INC
+            LOAD MUL1
+            INC
+            STORE MUL1
+whilecnd:  LOAD TMP2
+            SHIFT MUL1
+            SUB TMP1
+            DEC
+            JNEG whilecntnt
+
+
+            LOAD MUL1
+            DEC
+            STORE MUL1 // od teraz to już jest i, nie count
+            JUMP forcnd
+forcntnt:   LOAD TMP2
+            SHIFT MUL1
+            STORE MUL3
+            LOAD TMP1
+            SUB MUL3
+            INC
+            JPOS ifcntnt
+            DEC
+            LOAD MUL2
+            SHIFT ONE
+            STORE MUL2
+            JUMP ifout
+ifcntnt:    DEC
+            STORE TMP1
+            LOAD MUL2
+            INC
+            SHIFT ONE
+            STORE MUL2
+ifout:      LOAD MUL1
+            DEC
+            STORE MUL1
+
+forcnd:     INC
+            JPOS forcntnt
+
+            LOAD MUL2
+            SHIFT MINUSONE
+
     f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać MOD
-        // TODO
+        // TODO ujemne
+        to samo, co w div, tylko return a na końcu
 
 Command: NADPISUJE REJESTRY: wszystkie rejestry komend
 
@@ -212,6 +301,7 @@ cntnt: ## uruchom każdą command ##
 
 cntnt: INC // trik, zamiast JNEG my chcemy JNEG + JZERO (gdy iterator jest równy końcowi pętli, to powinna się ona wykonać)
            // dlatego przez JNEG odejmujemy jedynkę, a po skoku ją dodajemy
+           // później: "INC chyba zbędne, i tak nadpisujemy akumulator"
        ## uruchom każdą command ##
 
        LOAD &iterator

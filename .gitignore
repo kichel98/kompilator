@@ -8,3 +8,5 @@ jftt_testy/*
 src/test/resources/5-tab-proby.imp
 
 outputcopy.txt
+
+src/main/java/core/testScore.txt

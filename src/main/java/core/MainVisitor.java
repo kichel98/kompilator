@@ -5,9 +5,7 @@ import syntax.command.*;
 import syntax.condition.*;
 import syntax.declarations.ArrDeclaration;
 import syntax.declarations.VarDeclaration;
-import syntax.expression.AddExpression;
-import syntax.expression.MulExpression;
-import syntax.expression.SubExpression;
+import syntax.expression.*;
 import syntax.identifier.ArrConstIdentifier;
 import syntax.identifier.ArrVarIdentifier;
 import syntax.identifier.VarIdentifier;
@@ -274,7 +272,7 @@ public class MainVisitor extends Visitor {
          */
         STORE(TMP1);
         LOAD(TMP2);
-        STORE(TMP2);
+//        STORE(TMP2);
 
         String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
         String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
@@ -316,6 +314,46 @@ public class MainVisitor extends Visitor {
 
         LOAD(MUL1);
 
+    }
+
+    @Override
+    public void preVisit(DivExpression divExpression) {
+        SUB(0L);
+        STORE(MUL1);
+        STORE(MUL2);
+    }
+
+    @Override
+    public void inVisit(DivExpression divExpression) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void postVisit(DivExpression divExpression) {
+        executeDivisionAlgorithm();
+
+        // naprawa po ostatnim obiegu pętli w executeDivisionAlgorithm
+        LOAD(MUL2);
+        SHIFT(MINUSONE);
+
+    }
+
+    @Override
+    public void preVisit(ModExpression modExpression) {
+        SUB(0L);
+        STORE(MUL1);
+        STORE(MUL2);
+    }
+
+    @Override
+    public void inVisit(ModExpression modExpression) {
+        STORE(TMP2);
+    }
+
+    @Override
+    public void postVisit(ModExpression modExpression) {
+        executeDivisionAlgorithm();
+        LOAD(TMP1);
     }
 
     @Override
@@ -409,7 +447,7 @@ public class MainVisitor extends Visitor {
         STORE(MINUSONE);
     }
 
-
+    @Deprecated
     private void generateConstant(Long constant) {
         if (constant > 0) {
             LOAD(ONE);
@@ -453,5 +491,60 @@ public class MainVisitor extends Visitor {
             if (i != charArray.length - 1)
                 SHIFT(ONE);
         }
+    }
+
+    private void executeDivisionAlgorithm() {
+        STORE(TMP1);
+
+        String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
+        JUMP(whileCnd);
+        String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
+        printLabel(whileCntnt);
+        INC();
+        LOAD(MUL1);
+        INC();
+        STORE(MUL1);
+        printLabel(whileCnd);
+        LOAD(TMP2);
+        SHIFT(MUL1);
+        SUB(TMP1);
+        DEC();
+        JNEG(whileCntnt);
+
+        LOAD(MUL1);
+        DEC();
+        STORE(MUL1);
+        String forCnd = "forcnd" + getLabelCounterAndThenIncrement();
+        JUMP(forCnd);
+        String forCntnt = "forcntnt" + getLabelCounterAndThenIncrement();
+        printLabel(forCntnt);
+        LOAD(TMP2);
+        SHIFT(MUL1);
+        STORE(MUL3);
+        LOAD(TMP1);
+        SUB(MUL3);
+        String ifCntnt = "ifcntnt" + getLabelCounterAndThenIncrement();
+        INC();
+        JPOS(ifCntnt);
+        DEC();
+        LOAD(MUL2);
+        SHIFT(ONE);
+        STORE(MUL2);
+        String ifOut = "ifout" + getLabelCounterAndThenIncrement();
+        JUMP(ifOut);
+        printLabel(ifCntnt);
+        DEC();
+        STORE(TMP1);
+        LOAD(MUL2);
+        INC();
+        SHIFT(ONE);
+        STORE(MUL2);
+        printLabel(ifOut);
+        LOAD(MUL1);
+        DEC();
+        STORE(MUL1);
+        printLabel(forCnd);
+        INC();
+        JPOS(forCntnt);
     }
 }

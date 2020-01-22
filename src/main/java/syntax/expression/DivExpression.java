@@ -28,6 +28,10 @@ public class DivExpression implements Expression {
 
     @Override
     public void accept(Visitor v) {
-
+        v.preVisit(this);
+        b.accept(v);
+        v.inVisit(this);
+        a.accept(v);
+        v.postVisit(this);
     }
 }
