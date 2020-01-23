@@ -1,14 +1,139 @@
-0-div-mod.imp - DIV MOD
-00-div-mod.imp - DIV MOD
-1-numbers.imp - DIV
-2-fib.imp - DZIAŁA!
-3-fib-factorial.imp - DZIAŁA!
-4-factorial.imp - MOD 2
-5-tab.imp - DZIAŁA!
-6-mod-mult.imp - MOD
-7-loopiii.imp - DZIAŁA!
-8-for.imp - DZIAŁA!
-9-sort.imp - MOD
-program0.imp - DIV
-program1.imp - DZIAŁA!
-program2.imp - MOD DIV
+0-div-mod.imp - In: 1 0 Out: 1 0 0 0, Koszt: 2503
+00-div-mod.imp - In: 33 7 Out: 4 5 -5 -2 4 -5 -5 2, Koszt: 9337
+1-numbers.imp - Out: to co trzeba, Koszt: 9257
+2-fib.imp - In: 1 Out: 121393, Koszt: 19233
+3-fib-factorial.imp - In: 20 Out: 2432902008176640000 6755, Koszt: 32503
+4-factorial.imp - In: 20 Out: 2432902008176640000, Koszt: 69656
+5-tab.imp Out:
+> 0
+> 24
+> 46
+> 66
+> 84
+> 100
+> 114
+> 126
+> 136
+> 144
+> 150
+> 154
+> 156
+> 156
+> 154
+> 150
+> 144
+> 136
+> 126
+> 114
+> 100
+> 84
+> 66
+> 46
+> 24
+> 0, Koszt: 36389
+6-mod-mult.imp - In: 1234567890 1234567890987654321 987654321, Out: 674106858, Koszt: 1245646
+7-loopiii.imp In: 0 0 0, Out: 31000 40900 2222010, Koszt: 503977
+              In: 1 0 2, Out: 31001 40900 2222012, Koszt: 503977
+8-for.imp - In: 12 23 34, Out: 507 4379 0, Koszt: 246647
+9-sort.imp - Out:
+> 1
+> 14
+> 12
+> 7
+> 6
+> 15
+> 3
+> 19
+> 13
+> 21
+> 18
+> 22
+> 9
+> 11
+> 16
+> 17
+> 8
+> 20
+> 4
+> 10
+> 2
+> 5
+> 1234567890
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> 8
+> 9
+> 10
+> 11
+> 12
+> 13
+> 14
+> 15
+> 16
+> 17
+> 18
+> 19
+> 20
+> 21
+> 22, Koszt: 165703
+program0.imp - In: 1345601, Out:
+> 1
+> 0
+> 0
+> 0
+> 0
+> 0
+> 1
+> 0
+> 0
+> 0
+> 0
+> 1
+> 0
+> 0
+> 0
+> 1
+> 0
+> 0
+> 1
+> 0
+> 1, Koszt: 107468
+program1.imp - Out: > 2
+                    > 3
+                    > 5
+                    > 7
+                    > 11
+                    > 13
+                    > 17
+                    > 19
+                    > 23
+                    > 29
+                    > 31
+                    > 37
+                    > 41
+                    > 43
+                    > 47
+                    > 53
+                    > 59
+                    > 61
+                    > 67
+                    > 71
+                    > 73
+                    > 79
+                    > 83
+                    > 89
+                    > 97, Koszt: 97905
+program2.imp In: 12345678901, Out: > 857
+                                   > 1
+                                   > 14405693
+                                   > 1, Koszt: 17506462
+
+             In: 12345678903, Out: > 3
+                                   > 1
+                                   > 4115226301
+                                   > 1, Koszt: 339476671

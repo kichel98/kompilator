@@ -27,7 +27,10 @@ public class Memory {
         MINUSONE(5L),
         MUL1(6L),
         MUL2(7L),
-        MUL3(8L);
+        MUL3(8L),
+        DIV1(9L),
+        DIV2(10L);
+
         Long idx;
 
         private Register(Long idx) {

@@ -332,10 +332,6 @@ public class MainVisitor extends Visitor {
     public void postVisit(DivExpression divExpression) {
         executeDivisionAlgorithm();
 
-        // naprawa po ostatnim obiegu pętli w executeDivisionAlgorithm
-        LOAD(MUL2);
-        SHIFT(MINUSONE);
-
     }
 
     @Override
@@ -496,6 +492,45 @@ public class MainVisitor extends Visitor {
     private void executeDivisionAlgorithm() {
         STORE(TMP1);
 
+        LOAD(TMP2);
+        String divZero = "divzero" + getLabelCounterAndThenIncrement();
+        JZERO(divZero);
+
+        String bSgnCntnt = "bsgncntnt" + getLabelCounterAndThenIncrement();
+        JPOS(bSgnCntnt);
+        STORE(DIV2);
+        SUB(0L);
+        SUB(DIV2);
+        STORE(TMP2);
+        LOAD(MINUSONE);
+        STORE(DIV2);
+        String outBSgn = "outbsgn" + getLabelCounterAndThenIncrement();
+        JUMP(outBSgn);
+        printLabel(bSgnCntnt);
+        LOAD(ONE);
+        STORE(DIV2);
+        printLabel(outBSgn);
+
+        LOAD(TMP1);
+        String aSgnCntnt = "asgncntnt" + getLabelCounterAndThenIncrement();
+        JPOS(aSgnCntnt);
+        STORE(DIV1);
+        SUB(0L);
+        SUB(DIV1);
+        STORE(TMP1);
+        LOAD(MINUSONE);
+        STORE(DIV1);
+//        STORE(TMP2);
+        String outASgn = "outasgn" + getLabelCounterAndThenIncrement();
+        JUMP(outASgn);
+        printLabel(aSgnCntnt);
+        LOAD(ONE);
+        STORE(DIV1);
+        printLabel(outASgn);
+
+
+
+
         String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
         JUMP(whileCnd);
         String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
@@ -546,5 +581,78 @@ public class MainVisitor extends Visitor {
         printLabel(forCnd);
         INC();
         JPOS(forCntnt);
+
+        // naprawa po ostatnim obiegu pętli
+        LOAD(MUL2);
+        SHIFT(MINUSONE);
+        STORE(MUL2);
+
+        LOAD(DIV1);
+        String div1PosCntnt = "div1poscntnt" + getLabelCounterAndThenIncrement();
+        JPOS(div1PosCntnt);
+            /* zewnętrzny else */
+            LOAD(DIV2);
+            String div2PosCntnt2 = "div2poscntnt2" + getLabelCounterAndThenIncrement();
+            JPOS(div2PosCntnt2);
+                /* wewnętrzny else */
+                LOAD(TMP1);
+                SUB(0L);
+                SUB(TMP1);
+                STORE(TMP1);
+
+            String div2Out2 = "div2out2" + getLabelCounterAndThenIncrement();
+            JUMP(div2Out2);
+            printLabel(div2PosCntnt2);
+                /* wewnętrzny if */
+                LOAD(MUL2);
+                SUB(0L);
+                SUB(MUL2);
+                DEC();
+                STORE(MUL2);
+
+                LOAD(TMP2);
+                SUB(TMP1);
+                STORE(TMP1);
+
+            printLabel(div2Out2);
+        String div1Out = "div1out" + getLabelCounterAndThenIncrement();
+        JUMP(div1Out);
+        printLabel(div1PosCntnt);
+            /* zewnętrzny if */
+            LOAD(DIV2);
+            String div2PosCntnt1 = "div2PosCntnt1" + getLabelCounterAndThenIncrement();
+            JPOS(div2PosCntnt1);
+                /* wewnętrzny else */
+                LOAD(MUL2);
+                SUB(0L);
+                SUB(MUL2);
+                DEC();
+                STORE(MUL2);
+
+                LOAD(TMP2);
+                SUB(TMP1);
+                STORE(TMP1);
+                SUB(0L);
+                SUB(TMP1);
+                STORE(TMP1);
+            String div2Out1 = "div2out1" + getLabelCounterAndThenIncrement();
+            JUMP(div2Out1);
+            printLabel(div2PosCntnt1);
+                /* wewnętrzny if */
+
+            printLabel(div2Out1);
+
+        printLabel(div1Out);
+
+
+        LOAD(MUL2);
+
+
+        String outDivZero = "outdivzero" + getLabelCounterAndThenIncrement();
+        JUMP(outDivZero);
+        printLabel(divZero);
+        STORE(TMP1);
+        STORE(MUL2);
+        printLabel(outDivZero);
     }
 }

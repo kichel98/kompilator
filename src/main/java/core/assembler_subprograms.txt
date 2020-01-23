@@ -151,7 +151,7 @@ cond:   STORE TMP1
         while( tmp2 > 0) add ACC; STORE TMP1; LOAD TMP2; DEC; STORE TMP2; LOAD TMP1;
 
     e) DivExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2, MUL1, MUL2, MUL3
-        // TODO ujemne
+        // TODO tylko jeden z pary (a, b) jest ujemny, to daje zły wynik
         Algorytm:
         dzielenie pisemne na binarce
         Najpierw wyznaczamy count - zmienną, która mówi ile maksymalnie razy jesteśmy w stanie
@@ -165,6 +165,12 @@ cond:   STORE TMP1
         Pseudokod:
 
         zmienne: a, b, count = 0, wynik = 0
+
+        if b == 0 {
+            a == 0
+            wynik == 0
+            EXIT
+        }
 
         while( (b << count) <= a ) {
             count++;
@@ -195,6 +201,37 @@ cond:   STORE TMP1
 
 
             // ustaw count i wynik na zero
+
+            LOAD TMP2
+            JZERO divzero
+
+            JPOS bsgncntnt
+            STORE DIV2 // wrzucasz b na chwilę
+            SUB 0
+            SUB DIV2 // negacja b
+            STORE TMP2
+            LOAD MINUSONE
+            STORE DIV2
+            JUMP outbsgn
+bsgncntnt:  LOAD ONE
+            STORE DIV2
+outbsgn:
+
+            LOAD TMP1
+            JPOS asgncntnt
+            STORE DIV1 // wrzucasz a na chwilę
+            SUB 0
+            SUB DIV1 // negacja a
+            STORE TMP1
+            LOAD MINUSONE
+            STORE DIV1
+            JUMP outasgn
+asgncntnt:  LOAD ONE
+            STORE DIV1
+outasgn:
+
+
+
 
             JUMP whilecnd
 whilecntnt: INC
@@ -239,6 +276,49 @@ forcnd:     INC
 
             LOAD MUL2
             SHIFT MINUSONE
+            STORE MUL2
+
+            LOAD DIV1
+            JPOS div1poscntnt
+            /**
+                zewnętrzny else, a < 0 // TODO: a może być równe 0
+
+                LOAD DIV2
+                JPOS div2poscntnt2
+                /**
+                    wewnętrzny else, a < 0 && b < 0
+                 **/
+                JUMP div2out2
+    div2poscntnt2: /**
+                    wewnętrzny if, a < 0 && b > 0
+                **/
+    div2out2:
+
+            **/
+            JUMP div1out
+div1poscntnt: /**
+                zewnętrzny if, a > 0
+
+                LOAD DIV2
+                JPOS div2poscntnt1
+                /**
+                    wewnętrzny else, a > 0 && b < 0
+                **/
+                JUMP div2out1
+  div2poscntnt1: /**
+                    wewnętrzny if, a > 0 && b > 0
+                **/
+  div2out1:
+
+            **/
+div1out:
+
+
+
+            JUMP outdivzero
+divzero:    STORE(TMP1) // zapisujesz zero do tmp1 i tmp, jeśli tu jesteś, to 0 na pewno jest w ACC
+            STORE(MUL2)
+outdivzero:
 
     f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać MOD
         // TODO ujemne
