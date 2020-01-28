@@ -9,6 +9,12 @@ Do korzystania z kompilatora potrzebne są:
 * Maven (testowane na wersji 3.6.2)
 * Java (testowane na wersji 11)
 
+Na systemie Ubuntu można zainstalować Mavena komendą:
+
+```
+sudo apt install maven
+```
+
 ## Budowanie
 
 Do skompilowania używana jest komenda:
