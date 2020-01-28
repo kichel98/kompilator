@@ -33,7 +33,7 @@ make
 Uruchomienie:
 
 ```
-java -cp target/simple-maven-full-1.0.jar core.kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
+java -cp target/kompilator-full-1.0.jar core.kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
 ```
 
 ## Files:
