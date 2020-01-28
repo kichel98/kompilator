@@ -1,17 +1,13 @@
-# kompilator
-JFlex with cup
-==============
+# Kompilator
+Autor: Piotr Andrzejewski
 
-This directory contains a small example of integration
-between JFlex and [CUP][cup].
+Nr indeksu: 244931
 
-It comes from a [short article series in the Linux Gazette][1]
-by Richard A. Sevenich and Christopher Lopes,
-titled _Compiler Construction Tools_.
+## Wymagania
 
-Small changes and updates to newest JFlex+Cup versions by Gerwin Klein.
-
-## Build and run
+Do korzystania z kompilatora potrzebne są:
+* Maven 
+* Java
 
 To compile:
 
@@ -26,12 +22,12 @@ To run:
 
 ```
 mvn package
-java -jar target/simple-maven-full-1.0.jar core.Main test.txt
+java -jar target/simple-maven-full-1.0.jar core.kompilator test.txt
 ```
 
 ## Files:
 
-* `src/main/java/core.Main.java`         demo of a main program
+* `src/main/java/core.kompilator.java`         demo of a main program
 * `src/main/flex/lcalc.flex`        the lexer spec
 * `src/main/cup/ycalc.cup`          the parser spec
 * `src/test/resources/test.txt`     sample input for testing
@@ -40,5 +36,3 @@ java -jar target/simple-maven-full-1.0.jar core.Main test.txt
   - The `jflex-maven-plugin` generates `Lexer.java` from `lcalc.flex`
   - The `cup-maven-plugin` generates `sym.class` from `ycalc.cup`
   
-[cup]: http://www2.cs.tum.edu/projects/cup/
-[1]: http://www.linuxgazette.com/issue39/sevenich.html

@@ -21,7 +21,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class Main {
+public class kompilator {
     static public void main(String[] argv) {
         try {
             // TODO IMIĘ I NAZWISKO W README!!!!!!! I NUMER INDEKSU
@@ -58,7 +58,7 @@ public class Main {
     }
 
     private static void printUsage() {
-        System.out.println("Usage: java core.Main <inputfile> <outputFile>");
+        System.out.println("Usage: java core.kompilator <inputfile> <outputFile>");
     }
 }
 

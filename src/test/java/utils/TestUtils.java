@@ -69,7 +69,7 @@ public class TestUtils {
         FileOutputStream fos = new FileOutputStream(outputFile, true);
         System.setOut(new PrintStream(fos));
 
-        Main.main(argv);
+        kompilator.main(argv);
 
         fos.close();
 
