@@ -6,33 +6,42 @@ Nr indeksu: 244931
 ## Wymagania
 
 Do korzystania z kompilatora potrzebne są:
-* Maven 
-* Java
+* Maven (testowane na wersji 3.6.2)
+* Java (testowane na wersji 11)
 
-To compile:
+## Budowanie
 
-```
-mvn compile test
-```
-
-This will build and test that the `src/test/resources/test.txt` file
-is parsed and generates the expected `src/test/resources/output.good`.
-
-To run:
+Do skompilowania używana jest komenda:
 
 ```
-mvn package
-java -jar target/simple-maven-full-1.0.jar core.kompilator test.txt
+mvn compile
+```
+
+Do zbudowania pliku JAR używana jest komenda:
+
+```
+mvn package -Dmaven.test.skip=true
+``` 
+
+Przygotowany został plik Makefile, który wykonuje powyższą komendę. Można go uruchomić poleceniem:
+```
+make
+```
+
+## Uruchomienie
+
+Uruchomienie:
+
+```
+java -cp target/simple-maven-full-1.0.jar core.kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
 ```
 
 ## Files:
 
-* `src/main/java/core.kompilator.java`         demo of a main program
-* `src/main/flex/lcalc.flex`        the lexer spec
-* `src/main/cup/ycalc.cup`          the parser spec
-* `src/test/resources/test.txt`     sample input for testing
-* `src/test/resources/output.good`  how the output should look like for the test
-* `pom.xml`                         the Maven Project model
-  - The `jflex-maven-plugin` generates `Lexer.java` from `lcalc.flex`
-  - The `cup-maven-plugin` generates `sym.class` from `ycalc.cup`
+* `src/main/java/core/kompilator.java`  główny plik
+* `src/main/flex/lexer.flex`            specyfikacja leksera
+* `src/main/cup/parser.cup`             specyfikacja parsera
+* `pom.xml`                             Maven Project model
+  - `jflex-maven-plugin` generuje `Lexer.java` z `lexer.flex`
+  - `cup-maven-plugin` generuje `sym.class` z `parser.cup`
   
