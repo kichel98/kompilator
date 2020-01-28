@@ -94,6 +94,7 @@
               <artifactSet>
                 <includes>
                   <include>com.github.vbmacher:java-cup-runtime</include>
+                  <include>org.apache.commons:commons-lang3</include>
                 </includes>
               </artifactSet>
             </configuration>
