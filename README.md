@@ -9,6 +9,12 @@ Do korzystania z kompilatora potrzebne są:
 * Maven (testowane na wersji 3.6.2)
 * Java (testowane na wersji 11)
 
+Na systemie Ubuntu można zainstalować Mavena komendą:
+
+```
+sudo apt install maven
+```
+
 ## Budowanie
 
 Do skompilowania używana jest komenda:
@@ -17,7 +23,7 @@ Do skompilowania używana jest komenda:
 mvn compile
 ```
 
-Do zbudowania pliku JAR używana jest komenda:
+Do kompilacji i zbudowania pliku JAR używana jest komenda:
 
 ```
 mvn package -Dmaven.test.skip=true
@@ -33,7 +39,7 @@ make
 Uruchomienie:
 
 ```
-java -cp target/simple-maven-full-1.0.jar core.kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
+java -cp target/kompilator-full-1.0.jar core.kompilator <nazwa pliku wejściowego> <nazwa pliku wyjściowego>
 ```
 
 ## Files:
