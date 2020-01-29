@@ -23,7 +23,7 @@ Do skompilowania używana jest komenda:
 mvn compile
 ```
 
-Do zbudowania pliku JAR używana jest komenda:
+Do kompilacji i zbudowania pliku JAR używana jest komenda:
 
 ```
 mvn package -Dmaven.test.skip=true
