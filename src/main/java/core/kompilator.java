@@ -24,7 +24,6 @@ import java.io.StringWriter;
 public class kompilator {
     static public void main(String[] argv) {
         try {
-            // TODO IMIĘ I NAZWISKO W README!!!!!!! I NUMER INDEKSU
             ComplexSymbolFactory symbolFactory = new ComplexSymbolFactory();
             parser p = new parser(new Lexer(new FileReader(argv[0]), symbolFactory), symbolFactory);
             Program result = (Program) p.parse().value;

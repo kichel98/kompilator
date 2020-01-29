@@ -1,5 +1,6 @@
 package integration;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import utils.TestUtils;
 
@@ -15,6 +16,7 @@ public class LexerTest {
 
 
     @Test
+    @Ignore
     public void testOutput() throws Exception {
         // given
         String inputFile = "src/test/resources/test.txt";

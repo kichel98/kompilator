@@ -12,11 +12,11 @@ Command - wykonuje operacje
 
 Identifier: NADPISUJE REJESTRY: ACC, TMP1
 
-    a) VarIdentifier NADPISUJE REJESTRY: ACC
+    a) VarIdentifier NADPISUJE REJESTRY: ACC, TMP1
 
         generateConstant(&var)
 
-    b) ArrConstIdentifier NADPISUJE REJESTRY: ACC
+    b) ArrConstIdentifier NADPISUJE REJESTRY: ACC, TMP1
 
         generateConstant(&var)
 
@@ -30,7 +30,7 @@ Identifier: NADPISUJE REJESTRY: ACC, TMP1
 
 Value: NADPISUJE REJESTRY: ACC, TMP1
 
-    a) NumValue  NADPISUJE REJESTRY: ACC
+    a) NumValue  NADPISUJE REJESTRY: ACC, TMP1
 
         generateConstant(val)
 
@@ -129,8 +129,6 @@ Expression: NADPISUJE REJESTRY: ACC, TMP1, TMP2
 
     d) MulExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2, MUL1, MUL2
         // geeksforgeeks.org/multiplication-two-numbers-shift-operator/
-        // TODO: ujemne! (działa, gdy pierwsza liczba ujemna, nie działa, gdy druga)
-        // TODO: tak jak w GFG, nie tak jak niżej, uaktualnij
         ## uruchom value2 ##
         STORE TMP2
         ## uruchom value1 ##
@@ -151,7 +149,6 @@ cond:   STORE TMP1
         while( tmp2 > 0) add ACC; STORE TMP1; LOAD TMP2; DEC; STORE TMP2; LOAD TMP1;
 
     e) DivExpression NADPISUJE REJESTRY: ACC, TMP1, TMP2, MUL1, MUL2, MUL3
-        // TODO tylko jeden z pary (a, b) jest ujemny, to daje zły wynik
         Algorytm:
         dzielenie pisemne na binarce
         Najpierw wyznaczamy count - zmienną, która mówi ile maksymalnie razy jesteśmy w stanie
@@ -281,7 +278,7 @@ forcnd:     INC
             LOAD DIV1
             JPOS div1poscntnt
             /**
-                zewnętrzny else, a < 0 // TODO: a może być równe 0
+                zewnętrzny else, a < 0 // TODO: a może być równe 0 (chyba naprawione)
 
                 LOAD DIV2
                 JPOS div2poscntnt2
@@ -321,7 +318,6 @@ divzero:    STORE(TMP1) // zapisujesz zero do tmp1 i tmp, jeśli tu jesteś, to 
 outdivzero:
 
     f) ModExpression // jeśli będzie potrzebował nowych rejestrów, to po prostu będzie się nazywać MOD
-        // TODO ujemne
         to samo, co w div, tylko return a na końcu
 
 Command: NADPISUJE REJESTRY: wszystkie rejestry komend
@@ -428,11 +424,10 @@ cond:  SUB &iterator+1
 
 
 Dodatkowe operacje:
-generateConstant(const) - umieszcza wartość stałej const (np. 7) w ACC, NADPISUJE REJESTRY: ACC
+generateConstant(const) - umieszcza wartość stałej const (np. 7) w ACC, NADPISUJE REJESTRY: ACC, TMP1
 setOneRegister() - generuje wartość 1 i umieszcza w specjalnym rejestrze ONE
 
 generateConstant(const) { // TODO: zostało zmienione, opisz zmiany
-    // TODO: dla ujemnych nie będzie działać na maszynie dużych liczb
     LOAD ONE
     SHIFT ONE # mnóż ACC przez 2^1 tak długo, aż przekroczysz stałą (w Javie)
     .

@@ -272,47 +272,15 @@ public class MainVisitor extends Visitor {
          */
         STORE(TMP1);
         LOAD(TMP2);
-//        STORE(TMP2);
 
-        String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
-        String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
-        JUMP(whileCnd);
-        printLabel(whileCntnt);
-        /*
-         środek pętli
-        */
-            LOAD(TMP2);
-            SHIFT(MINUSONE);
-            SHIFT(ONE);
-            SUB(TMP2);
-
-            String ifCntnt = "ifcntnt" + getLabelCounterAndThenIncrement();
-            JNEG(ifCntnt);
-            String ifOutside = "ifout" + getLabelCounterAndThenIncrement();
-            JUMP(ifOutside);
-            printLabel(ifCntnt);
-                /* if start */
-                LOAD(TMP1);
-                SHIFT(MUL2);
-                ADD(MUL1);
-                STORE(MUL1);
-                /* if end*/
-            printLabel(ifOutside);
-
-            LOAD(MUL2);
-            INC();
-            STORE(MUL2);
-            LOAD(TMP2);
-            SHIFT(MINUSONE);
-            STORE(TMP2);
-
-        /*
-        koniec pętli
-         */
-        printLabel(whileCnd);
-        JPOS(whileCntnt);
-
-        LOAD(MUL1);
+        String bNegCntnt = "bnegcntnt" + getLabelCounterAndThenIncrement();
+        JNEG(bNegCntnt);
+        multiply(false); // b > 0
+        String bNegOut = "bnegout" + getLabelCounterAndThenIncrement();
+        JUMP(bNegOut);
+        printLabel(bNegCntnt);
+        multiply(true); // b < 0
+        printLabel(bNegOut);
 
     }
 
@@ -470,11 +438,15 @@ public class MainVisitor extends Visitor {
         } else {
             SUB(0L);
         }
-
     }
 
     private void generateConstantFaster(Long constant) {
-        String binConst = Long.toBinaryString(constant);
+        String binConst;
+        if (constant < 0) {
+            binConst = Long.toBinaryString(-1 * constant);
+        } else {
+            binConst = Long.toBinaryString(constant);
+        }
 
         SUB(0L);
 
@@ -487,6 +459,66 @@ public class MainVisitor extends Visitor {
             if (i != charArray.length - 1)
                 SHIFT(ONE);
         }
+
+        if(constant < 0) {
+            STORE(TMP1);
+            SUB(0L);
+            SUB(TMP1);
+        }
+    }
+
+    private void multiply(boolean isBNegative) {
+
+        if(isBNegative) {
+            SUB(0L);
+            SUB(TMP2);
+            STORE(TMP2);
+        }
+
+        String whileCnd = "whilecnd" + getLabelCounterAndThenIncrement();
+        String whileCntnt = "whilecntnt" + getLabelCounterAndThenIncrement();
+        JUMP(whileCnd);
+        printLabel(whileCntnt);
+        /*
+         środek pętli
+        */
+        LOAD(TMP2);
+        SHIFT(MINUSONE);
+        SHIFT(ONE);
+        SUB(TMP2);
+
+        String ifCntnt = "ifcntnt" + getLabelCounterAndThenIncrement();
+        JNEG(ifCntnt);
+        String ifOutside = "ifout" + getLabelCounterAndThenIncrement();
+        JUMP(ifOutside);
+        printLabel(ifCntnt);
+        /* if start */
+        LOAD(TMP1);
+        SHIFT(MUL2);
+        ADD(MUL1);
+        STORE(MUL1);
+        /* if end*/
+        printLabel(ifOutside);
+
+        LOAD(MUL2);
+        INC();
+        STORE(MUL2);
+        LOAD(TMP2);
+        SHIFT(MINUSONE);
+        STORE(TMP2);
+
+        /*
+        koniec pętli
+         */
+        printLabel(whileCnd);
+        JPOS(whileCntnt);
+
+        LOAD(MUL1);
+        if (isBNegative) {
+            SUB(0L);
+            SUB(MUL1);
+        }
+
     }
 
     private void executeDivisionAlgorithm() {
@@ -604,6 +636,11 @@ public class MainVisitor extends Visitor {
             JUMP(div2Out2);
             printLabel(div2PosCntnt2);
                 /* wewnętrzny if */
+                LOAD(TMP1);
+                String modZeroCntnt2 = "modzerocntnt2" + getLabelCounterAndThenIncrement();
+                JZERO(modZeroCntnt2);
+
+
                 LOAD(MUL2);
                 SUB(0L);
                 SUB(MUL2);
@@ -613,6 +650,15 @@ public class MainVisitor extends Visitor {
                 LOAD(TMP2);
                 SUB(TMP1);
                 STORE(TMP1);
+
+                String modZeroOut2 = "modzeroout2" + getLabelCounterAndThenIncrement();
+                JUMP(modZeroOut2);
+                printLabel(modZeroCntnt2);
+                LOAD(MUL2);
+                SUB(0L);
+                SUB(MUL2);
+                STORE(MUL2);
+                printLabel(modZeroOut2);
 
             printLabel(div2Out2);
         String div1Out = "div1out" + getLabelCounterAndThenIncrement();
@@ -623,6 +669,11 @@ public class MainVisitor extends Visitor {
             String div2PosCntnt1 = "div2PosCntnt1" + getLabelCounterAndThenIncrement();
             JPOS(div2PosCntnt1);
                 /* wewnętrzny else */
+                LOAD(TMP1);
+                String modZeroCntnt1 = "modzerocntnt1" + getLabelCounterAndThenIncrement();
+                JZERO(modZeroCntnt1);
+
+
                 LOAD(MUL2);
                 SUB(0L);
                 SUB(MUL2);
@@ -635,6 +686,17 @@ public class MainVisitor extends Visitor {
                 SUB(0L);
                 SUB(TMP1);
                 STORE(TMP1);
+
+                String modZeroOut1 = "modzeroout1" + getLabelCounterAndThenIncrement();
+                JUMP(modZeroOut1);
+                printLabel(modZeroCntnt1);
+                LOAD(MUL2);
+                SUB(0L);
+                SUB(MUL2);
+                STORE(MUL2);
+                printLabel(modZeroOut1);
+
+
             String div2Out1 = "div2out1" + getLabelCounterAndThenIncrement();
             JUMP(div2Out1);
             printLabel(div2PosCntnt1);

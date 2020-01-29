@@ -1,5 +1,6 @@
 package unit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import syntax.Program;
 import utils.TestUtils;
@@ -9,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MainVisitorTest {
 
     @Test
+    @Ignore
     public void readAndWrite() throws Exception {
         String input = String.join("\n",
                 "DECLARE",
