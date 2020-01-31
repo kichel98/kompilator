@@ -2,9 +2,12 @@ package syntax;
 
 import core.Visitor;
 import syntax.command.Command;
+import syntax.declarations.ArrDeclaration;
 import syntax.declarations.Declaration;
+import syntax.declarations.VarDeclaration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Program implements SyntaxElement {
     private List<Declaration> declarations;
@@ -38,13 +41,22 @@ public class Program implements SyntaxElement {
 
     @Override
     public void accept(Visitor v) {
-        if (this.declarations != null) {
-            this.declarations.forEach(declaration -> {
-                declaration.accept(v);
+        if (declarations != null) {
+            List<VarDeclaration> varDeclarations = declarations.stream()
+                    .filter(declaration -> (declaration instanceof VarDeclaration))
+                    .map(declaration -> (VarDeclaration) declaration).collect(Collectors.toList());
+            List<ArrDeclaration> arrDeclarations = declarations.stream()
+                    .filter(declaration -> (declaration instanceof ArrDeclaration))
+                    .map(declaration -> (ArrDeclaration) declaration).collect(Collectors.toList());
+            varDeclarations.forEach(varDeclaration -> {
+                varDeclaration.accept(v);
+            });
+            arrDeclarations.forEach(arrDeclaration -> {
+                arrDeclaration.accept(v);
             });
         }
         v.preVisit(this);
-        this.commands.forEach(command -> {
+        commands.forEach(command -> {
             command.accept(v);
         });
         v.postVisit(this);
