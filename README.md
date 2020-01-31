@@ -6,8 +6,8 @@ Nr indeksu: 244931
 ## Wymagania
 
 Do korzystania z kompilatora potrzebne są:
-* Maven (testowane na wersji 3.6.2)
-* Java (testowane na wersji 11)
+* Maven (testowane na wersji 3.6.0)
+* Java (testowane na wersji 13)
 
 Na systemie Ubuntu można zainstalować Mavena komendą:
 
